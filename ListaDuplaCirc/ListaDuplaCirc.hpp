@@ -10,7 +10,8 @@ class ListaDuplaCirc {
  /*!
   * ponteiros ElementoDuplo<T> da cabeça da lista e do sentinela
   */
-    ElementoDuplo<T> *head, *sentry;
+    ElementoDuplo<T> *head;
+    ElementoDuplo<T> *sentry;
     int size;/*<! inteiro para indicar o tamanho da lista>*/
 
  public:
@@ -18,7 +19,7 @@ class ListaDuplaCirc {
   * @brief construtor que inicializa a cabeça, o sentinela e o tamanho da lista.
   */
 	ListaDuplaCirc() {
-	    sentry = nullptr;
+	    sentry = new ElementoDuplo<T>(0, nullptr, nullptr);
 	    head = sentry;
 	    size = 0;
 	}
@@ -36,11 +37,14 @@ class ListaDuplaCirc {
  */
 	void adicionaNoInicioDuplo(const T& dado) {
 	    ElementoDuplo<T> *novo;
-	    novo = new ElementoDuplo<T>(dado, nullptr, sentry);
-        sentry = novo;
-        if (novo->getSucessor() != nullptr) {
+	    novo = new ElementoDuplo<T>(dado, sentry, nullptr);
+        if (sentry->getSucessor() != nullptr) {
+            novo->setSucessor(sentry->getSucessor());
             novo->getSucessor()->setAnterior(novo);
+        } else {
+            novo->setSucessor(sentry);
         }
+        sentry->setSucessor(novo);
         size++;
 	}
 /*!
@@ -53,11 +57,11 @@ class ListaDuplaCirc {
 	        throw "Erro lista vazia";
 	    } else {
 	        ElementoDuplo<T>* sai;
-	        sai = sentry;
+	        sai = sentry->getSucessor();
 	        T volta = sai->getInfo();
 	        sentry = sai->getSucessor();
-	        if (sentry != nullptr) {
-	            sentry->setAnterior(nullptr);
+	        if (sai->getSucessor() != sentry) {
+	            sai->getSucessor()->setAnterior(sentry);
 	        }
 	        delete sai;
 	        size--;
@@ -73,10 +77,10 @@ class ListaDuplaCirc {
 	    if (listaVazia()) {
 	        throw "ERROLISTAVAZIA";
 	    } else {
-	        ElementoDuplo<T>* remover = sentry;
+	        ElementoDuplo<T>* remover = sentry->getSucessor();
 	        sentry = remover->getSucessor();
-	        if (sentry->getSucessor() != nullptr) {
-	            sentry->getSucessor()->setAnterior(sentry);
+	        if (remover->getSucessor() != sentry) {
+	            remover->getSucessor()->setAnterior(sentry);
 	        }
 	        delete remover;
 	        size--;
@@ -96,16 +100,21 @@ class ListaDuplaCirc {
 	    } else {
 	        if (pos == 0 || listaVazia()) {
 	            adicionaNoInicioDuplo(dado);
+	        } else if (pos == size-1) {
+	            ElementoDuplo<T> *nov, *anterior;
+	            nov = new ElementoDuplo<T>(dado, sentry->getAnterior(), sentry);
+	            anterior = sentry->getAnterior();
+	            anterior->setSucessor(nov);
+	            sentry->setAnterior(nov);
+	            size++;
 	        } else {
 	            ElementoDuplo<T> *novo, *walker;
-	            walker = sentry;
+	            walker = sentry->getSucessor();
 	            for (int i = 0; i < pos - 1; i++) {
 	                walker = walker->getSucessor();
 	            }
 	            novo = new ElementoDuplo<T>(dado, walker, walker->getSucessor());
-	            if (novo->getSucessor() != nullptr) {
-	                novo->getSucessor()->setAnterior(novo);
-	            }
+	            novo->getSucessor()->setAnterior(novo);
 	            walker->setSucessor(novo);
 	            size++;
 	        }
@@ -122,13 +131,14 @@ class ListaDuplaCirc {
 	    if (listaVazia()) {
 	        throw "LISTAVAZIA";
 	    } else {
-	        ElementoDuplo<T>* walker = sentry;
-	        int i;
-	        for (i = 0; i < size; i++) {
+	        ElementoDuplo<T>* walker = sentry->getSucessor();
+	        int i = 0;
+	        while (walker->getSucessor() != sentry) {
 	            if (walker->getInfo() == dado) {
 	                return i;
 	            }
 	            walker = walker->getSucessor();
+	            i++;
 	        }
 	        throw "ELEMENTOINEXISTENTE";
 	    }
