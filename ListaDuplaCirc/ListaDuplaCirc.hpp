@@ -7,11 +7,8 @@ template <typename T>
  */
 class ListaDuplaCirc {
  private:
- /*!
-  * ponteiros ElementoDuplo<T> da cabeça da lista e do sentinela
-  */
-    ElementoDuplo<T> *head;
-    ElementoDuplo<T> *sentry;
+    ElementoDuplo<T> *head; /*<! Ponteiro do elemento cabeça da lista.*/
+    ElementoDuplo<T> *sentry;/*<! Ponteiro do elemento sentinela da lista*/
     int size;/*<! inteiro para indicar o tamanho da lista>*/
 
  public:
@@ -39,10 +36,12 @@ class ListaDuplaCirc {
 	    ElementoDuplo<T> *novo;
 	    novo = new ElementoDuplo<T>(dado, sentry, nullptr);
         if (sentry->getSucessor() != nullptr) {
-            novo->setSucessor(sentry->getSucessor());
-            novo->getSucessor()->setAnterior(novo);
+        	sentry->getSucessor()->setAnterior(novo);
+        	novo->setSucessor(sentry->getSucessor());
         } else {
-            novo->setSucessor(sentry);
+        	novo->setSucessor(sentry);
+        	novo->setAnterior(sentry);
+        	sentry->setAnterior(novo);
         }
         sentry->setSucessor(novo);
         size++;
@@ -59,10 +58,8 @@ class ListaDuplaCirc {
 	        ElementoDuplo<T>* sai;
 	        sai = sentry->getSucessor();
 	        T volta = sai->getInfo();
-	        sentry = sai->getSucessor();
-	        if (sai->getSucessor() != sentry) {
-	            sai->getSucessor()->setAnterior(sentry);
-	        }
+	       	sentry->setSucessor(sai->getSucessor());
+	        sentry->getSucessor()->setAnterior(sentry);
 	        delete sai;
 	        size--;
 	        return volta;
@@ -78,10 +75,8 @@ class ListaDuplaCirc {
 	        throw "ERROLISTAVAZIA";
 	    } else {
 	        ElementoDuplo<T>* remover = sentry->getSucessor();
-	        sentry = remover->getSucessor();
-	        if (remover->getSucessor() != sentry) {
-	            remover->getSucessor()->setAnterior(sentry);
-	        }
+	        sentry->setSucessor(remover->getSucessor());
+	        sentry->getSucessor()->setAnterior(sentry);
 	        delete remover;
 	        size--;
 	    }
@@ -100,11 +95,12 @@ class ListaDuplaCirc {
 	    } else {
 	        if (pos == 0 || listaVazia()) {
 	            adicionaNoInicioDuplo(dado);
-	        } else if (pos == size-1) {
+	        } else if (pos == size) {
 	            ElementoDuplo<T> *nov, *anterior;
-	            nov = new ElementoDuplo<T>(dado, sentry->getAnterior(), sentry);
+	            nov = new ElementoDuplo<T>(dado, nullptr, sentry);
 	            anterior = sentry->getAnterior();
 	            anterior->setSucessor(nov);
+	            nov->setAnterior(anterior);
 	            sentry->setAnterior(nov);
 	            size++;
 	        } else {
@@ -133,12 +129,11 @@ class ListaDuplaCirc {
 	    } else {
 	        ElementoDuplo<T>* walker = sentry->getSucessor();
 	        int i = 0;
-	        while (walker->getSucessor() != sentry) {
+	        for (i; i < size; i++) {
 	            if (walker->getInfo() == dado) {
 	                return i;
 	            }
 	            walker = walker->getSucessor();
-	            i++;
 	        }
 	        throw "ELEMENTOINEXISTENTE";
 	    }
@@ -178,9 +173,9 @@ class ListaDuplaCirc {
 	    if (listaVazia()) {
 	        return false;
 	    } else {
-	        ElementoDuplo<T> * walker = sentry;
+	        ElementoDuplo<T> * walker = sentry->getSucessor();
 	        int i;
-	        for (i = 0; i <= size; i++) {
+	        for (i = 0; i < size; i++) {
 	            if (walker->getInfo() == dado) {
 	                return true;
 	            }
@@ -203,18 +198,25 @@ class ListaDuplaCirc {
 	    } else {
 	        if (pos == 0) {
 	            return retiraDoInicioDuplo();
+	        } else if (pos == size) {
+	        	ElementoDuplo<T>* remover;
+	        	remover = sentry->getAnterior();
+	        	remover->getAnterior()->setSucessor(sentry);
+	        	remover->getSucessor()->setAnterior(remover->getAnterior());
+	        	T volta = remover->getInfo();
+	        	delete remover;
+	        	size--;
+	        	return volta;
 	        } else {
 	            ElementoDuplo<T> *remover, *walker;
-	            walker = sentry;
+	            walker = sentry->getSucessor();
 	            for (int i = 0; i < pos - 1; i++) {
 	                walker = walker->getSucessor();
 	            }
 	            remover = walker->getSucessor();
 	            T ret = remover->getInfo();
 	            walker->setSucessor(remover->getSucessor());
-	            if (walker->getSucessor() != nullptr) {
-	                remover->getSucessor()->setAnterior(walker);
-	            }
+				remover->getSucessor()->setAnterior(walker);
 	            delete remover;
 	            size--;
 	            return ret;
@@ -270,7 +272,7 @@ class ListaDuplaCirc {
 	    } else if (pos < 0 || pos > size) {
 	        throw "ERROPOSICAO";
 	    } else {
-	        ElementoDuplo<T>* walker = sentry;
+	        ElementoDuplo<T>* walker = sentry->getSucessor();
 	        for (int i = 0; i < pos; i++) {
 	            walker = walker->getSucessor();
 	        }
@@ -289,9 +291,9 @@ class ListaDuplaCirc {
 	    if (listaVazia()) {
 	        adicionaNoInicioDuplo(data);
 	    } else {
-	        atual = sentry;
+	        atual = sentry->getSucessor();
 	        posi = 1;
-	        while (atual->getSucessor() != nullptr &&
+	        while (atual->getSucessor() != sentry &&
 	                maior(data, atual->getInfo())) {
 	            atual = atual->getSucessor();
 	            posi++;
@@ -346,18 +348,14 @@ class ListaDuplaCirc {
 	}
 /*!
  * @brief método para destruir/deletar a lista.
- * método apenas faz um laço for e vai caminhando na lista deletando elemento
- * por elemento.
+ * método apenas faz um laço e vai chamando o método eliminaDoInicioDuplo()
+ * e só irá parar quando a lista estiver vazia, ou seja, seu size == 0;
+ * @see eliminaDoInicioDuplo();
  */
 	void destroiListaDuplo() {
-	   ElementoDuplo<T> *atual;
-	   atual = sentry;
-	   for (int i = 0; i < size-1; i++) {
-	       ElementoDuplo<T>* deleta = atual;
-	       atual = atual->getSucessor();
-	       delete deleta;
+	   while (!listaVazia()) {
+	   		eliminaDoInicioDuplo();
 	   }
-	   sentry = nullptr;
 	   head = sentry;
 	   size = 0;
 	}
