@@ -4,35 +4,31 @@ template <typename T>
 //! Classe de implementação de uma Lista Circular Simples.
 class ListaCirc {
  private:
-    Elemento<T>* sentry; /*<! ponteiro de elemento para auxiliar na lista.>*/
- 	Elemento<T>* head;
- 	int size;
+    Elemento<T>* sentry; /*<! ponteiro do elemento sentinela para auxiliar na lista.>*/
+ 	Elemento<T>* head; /*<! ponteiro do elemento cabeça da lista.>*/
+ 	int size; /*<! inteiro para indicar o tamanho da lista.>*/
 
  public:
-//! Construtor da Lista circular
 /*!
- * Construtor que inicializa o sentinela como um elemento sem info e aponta para si mesmo
- * o elemento head que aponta para o sentinela e o size que é o tamanho da lista recebe
- * zero.
+ * @brief Construtor que inicializa sentinela, faz a cabeça apontar para ele, e seta
+ * o tamanho para 0.
  */
 	ListaCirc() {
 	   sentry = new Elemento<T>(0,sentry);
 	   head = sentry;
 	   size = 0;
 	}
-//! Destrutor da lista circular
 /*!
+ * @brief destrutor da lista circular.
  * @see destroiLista()
  */
     ~ListaCirc() {
 	    destroiLista();
 	}
-//! Método para adicionar no inicio da lista
 /*!
+ * @brief método para adicionar um elemento no inicio da lista.
  * @param o endereço da memoria do dado que será adicionado da lista.
- * é criado um novo ponteiro de elemento, que é alocado, e o sentinela aponta
- * para esse elemento. se a lista não estiver vazia, o proximo do novo recebe o
- * proximo do sentry e o tamanho é incrementado.
+ * sem valor de retorno, e joga uma exceção caso algo dê errado.
  */
 	void adicionaNoInicio(const T& dado) {
 	    Elemento<T>* newE = new Elemento<T>(dado, nullptr);
@@ -44,15 +40,10 @@ class ListaCirc {
 	    	throw "ERROLISTACHEIA";
 	    }
 	}
-//! Método para retirar um elemento do inicio da lista.
 /*!
+ * @brief método que retira o primeiro elemento da lista e retorna seu dado.
  * @return um genérico que é a info do elemento retirado.
- * método testa se a lista está vazia, se sim joga uma exceção caso não, um
- * ponteiro de elemento é criado e esse elemento recebe o sentinela, um generico
- * é criado e recebe a info do elemento que recebeu o sentinela, e o sentinela
- * passa a apontar para o próximo elemento, e por fim é deletado o primeiro
- * elemento, o tamanho é decrementado e o genérico que foi criado anteriormente
- * é retornado.
+ * sem parâmetros, joga uma exceção caso a lista esteja vazia.
  * @see listaVazia()
  */
 	T retiraDoInicio() {
@@ -67,10 +58,11 @@ class ListaCirc {
 	        return volta;
 	    }
 	}
-//! Método para remover um elemento do inicio.
 /*!
- * método muito igual ao de retirar do inicio, unica diferença é que esse não
- * tem valor de retorno.
+ * @brief método para retirar o elemento do inicio sem retornar seu dado.
+ * método similar ao de retirar do inicio, unica diferença é que esse não
+ * tem valor de retorno, e como o retira do inicio joga uma exceção caso a
+ * lista esteja vazia.
  * @see listaVazia(), retiraDoInicio()
  */
 	void eliminaDoInicio() {
@@ -83,19 +75,15 @@ class ListaCirc {
 	        delete(deleter);
 	   }
 	}
-//! Método para adicionar um elemento em uma determinada posição na lista.
 /*!
+ * @brief método que adiciona um elemento em uma determinada posição da lista.
  * @param posição na memoria de um generico que será o dado adicionado na lista.
  * @param inteiro que irá indicar a posição que o dado será colocado na lista.
- * método verifica se a posição é valida, se ela for válida e for a posição
- * inicial, chama o método adicionaNoinicio senão, cria 2 ponteiro Elemento<T>
- * o primeiro recebe o sentinela, e um laço é criado para fazer esse ponteiro
- * andar na lista, quando o laço termina, o segundo ponteiro recebe o proximo
- * do primeiro o proximo do primeiro é setado para um novo elemento, o elemento
- * que foi adicionado na lista.
+ * sem valor de retorno, o método joga uma exceção caso a posição que lhe foi
+ * passada for invalida.
  */
 	void adicionaNaPosicao(const T& dado, int pos) {
-        if (pos < 0 || pos > this->size) {
+        if (pos < 0 || pos > size) {
 	        throw "ERROPOSICAO";
 	    } else if (pos == 0 || listaVazia()) {
 	        adicionaNoInicio(dado);
@@ -110,14 +98,12 @@ class ListaCirc {
 	        size++;
 	    }
 	}
-//! Método para retornar a posição de um determinado dado na lista.
 /*!
+ * @brief método que retorna a posição na lista de um dado específico.
  * @param a posição na memória de um genérico que é o dado que se quer encontrar
  * @return inteiro que vai ser a posição que o dado se encontra na lista
- * método simplesmente verifica se a lista está vazia, se não estiver, é criado
- * um ponteiro de elemento para caminhar na lista, e se enquanto ele faz essa 
- * "caminhada" for achado o dado, é retornado a posição que ele tá, se não for
- * achado, uma exceção é jogada.
+ * se a lista estiver vazia, o método retorna -1, o que seria algo parecido com
+ * uma exceção, e se o dado não existir na lista ele joga uma exceção.
  * @see listaVazia()
  */
 	int posicao(const T& dado) const {
@@ -136,14 +122,12 @@ class ListaCirc {
 	         throw "ERROELEMENTOINEXISTENTE";
 	   }
 	}
-//! Método para retornar a posição na memória de um determinado dado na lista.
 /*!
+ * @brief método para buscar a posição na memória de um dado específico.
  * @param a posição na memória de um genérico que é o dado que se quer encontrar
  * @return ponteiro que vai ser a posição na memória do dado passado como param
- * método simplesmente verifica se a lista está vazia, se não estiver, é criado
- * um ponteiro de elemento para caminhar na lista, e se enquanto ele faz essa 
- * "caminhada" for achado o dado, é retornado a posição na memória em que ele tá
- * se não for achado, uma exceção é jogada.
+ * joga uma exceção se a lista estiver vazia, e joga outra se o dado não existir
+ * na lista.
  * @see listaVazia()
  */
 	T* posicaoMem(const T& dado) const {
@@ -161,8 +145,8 @@ class ListaCirc {
 	         throw "ERROELEMENTOINEXISTENTE";
 	   }
 	}
-//! Método para saber se um dado existe na lista.
 /*!
+ * @brief método para saber se um determinado dado está presente na lista.
  * @param posição na memoria de um generico que é o dado que vai ser procurado.
  * @return boolean, verdadeiro se o dado existir na lista, falso caso não.
  * método tem uma estrutura muito parecida com o que procura a posição, o que
@@ -184,16 +168,12 @@ class ListaCirc {
 	    }
 	    return false;
 	}
-//! Método para retirar o dado de uma determinada posição.
 /*!
+ * @brief método para retirar um dado de uma determinada posição.
  * @param inteiro que é a posição que vai ser retirado o elemento.
  * @return um genérico que vai ser o dado do elemento retirado.
- * método testa se a posição é valida, se for valida se for a posição inicial,
- * chama o método retiraDoInicio(), senão caminha na lista com um laço for, 
- * um ponteiro de Elemento<T> recebe o proximo do elemento que caminhou no laço
- * um generico que recebe a info desse ponteiro, e o proximo do elemento que 
- * caminhou no laço recebe o proximo do ponteiro deleter, o tamanho da lista é
- * decrementado, e o elemento é deletado.
+ * joga uma exceção caso a posição seja invalida, e chama o retira do inicio
+ * caso essa posição seja a posição inicial.
  * @see retiraDoInicio()
  */
 	T retiraDaPosicao(int pos) {
@@ -219,8 +199,8 @@ class ListaCirc {
 	    }
 	    throw "ERROPOSICAO";
 	}
-//! Método para adicionar no fim da lista.
-/*!
+/*
+ * @brief método para adicionar um elemento ao fim da lista.
  * @param posição na memória de um generico que é o dado a ser adicionado.
  * se a lista estiver vazia o fim da lista é o inicio, logo chama o método
  * adicionaNoInicio(), se não estiver vazia, adicionaNaPosicao passando como
@@ -234,8 +214,8 @@ class ListaCirc {
 	        adicionaNaPosicao(dado, size);
 	    }
 	}
-//! método para retirar o ultimo elemento da lista.
 /*!
+ * @brief método para retirar um elemento do fim da lista.
  * @return um generico que é a info do elemento retirado.
  * é verificado se a lista está vazia, caso esteja uma exceção é jogada, caso
  * não esteja é retornado um retiraDaPosicao() assim deletando o ultimo elemento
@@ -249,8 +229,8 @@ class ListaCirc {
 	        return retiraDaPosicao(size-1);
 	    }
 	}
-//! Método para retirar um determinado dado da lista.
 /*!
+ * @brief método para retirar um dado específico da lista.
  * @param a posição na memória de um genérico que vai ser a info de um elemento.
  * @return um genérico que é a info do elemento retirado.
  * verifica se a lista está vazia, caso não retorna um retiraDaPosicao() e passa
@@ -264,8 +244,8 @@ class ListaCirc {
 	        return retiraDaPosicao(posicao(dado));
 	    }
 	}
-//! método para mostrar a info de um elemento em uma posição na lista.
 /*!
+ * @brief método para mostrar o dado que se encontra em uma determinada posição.
  * @param int que serve para indicar onde tá o elemento que se quer saber o dado
  * @return um genérico que é a info do elemento que está na posição pos.
  * método apenas caminha na lista até a posição passada como parâmetro e 
@@ -282,8 +262,8 @@ class ListaCirc {
 	   }
 	   return walker->getInfo();
 	}
-//! Método para adicionar os elementos em ordem.
 /*!
+ * @brief método para adicionar os elemento em ordem na lista.
  * @param a posição na memória do dado que vai ser add na lista.
  * método verifica se a lista está vazia, se estiver, é adicionado um elemento
  * no inicio da lista, senão é feita uma caminhada por toda a lista, até ela
@@ -313,55 +293,53 @@ class ListaCirc {
 	        }
 	    }
 	}
-//! Método para saber a posição do ultimo elemento.
 /*!
+ * @brief método para saber em que posição se encontra o ultimo elemento.
  * @return a posição do ultimo elemento.
  */
 	int verUltimo() {
 	  return size - 1;
 	}
-//! Método para saber se a lista está vazia
 /*!
+ * @brief método que retorna se a lista está vazia ou não.
  * @return boolean, verdadeiro se o size for igual a zero, falso se não
  * O método vai retornar verdadeiro quando a lista estiver vazia.
  */
 	bool listaVazia() const {
 	    return size == 0;
 	}
-//! Método para saber se um genérico é igual ao outro
-/*!
+/*! 
+ * @brief Método para saber se um genérico é igual ao outro
  * @return boolean, verdadeiro caso os dados forem iguais, falso caso não.
  */
 	bool igual(T dado1, T dado2) {
 	    return dado1 == dado2;
 	}
-//! Método para saber se um genérico é maior ao outro
-/*!
+/*! 
+ * @brief Método para saber se um genérico é maior ao outro
  * @return boolean, verdadeiro caso dado1 for maior que dado2, falso caso não.
  */
 	bool maior(T dado1, T dado2) {
 	    return dado1 > dado2;
 	}
-//! Método para saber se um genérico é menor ao outro
-/*!
+/*! 
+ * @brief Método para saber se um genérico é menor ao outro
  * @return boolean, verdadeiro caso dado1 for menor que dado2, falso caso não.
  */
 	bool menor(T dado1, T dado2) {
 	    return dado1 < dado2;
 	}
-//! Método para destruir a lista.
-/*!
- * método destroi lista cria dois ponteiros do tipo Elemento<T> e o primeiro
- * vai caminhar na lista, o segundo vai recebendo o que caminha, e vai deletando
- * quando a caminhada tem fim, size recebe 0 e o sentinela recebe nullptr;
+/*
+ * @brief método para destruir a lista.
+ * método destroi lista destroi a lista chamando o método elimina do inicio
+ * até a lista ficar vazia.
+ * @see eliminaDoInicio();
  */
     void destroiLista() {
-	    Elemento<T> *caminha, *deleter;
-	    caminha = sentry->getProximo();
-	    while (!listaVazia()) {
-	    	eliminaDoInicio();
-	    }
-	    size = 0;
-	    sentry->setProximo(sentry);
+		while (!listaVazia()) {
+	 		eliminaDoInicio();
+		}
+	size = 0;
+	sentry->setProximo(sentry);
 	}
 };
