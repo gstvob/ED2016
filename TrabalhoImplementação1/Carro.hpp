@@ -7,6 +7,7 @@
  class Carro {
   protected:
   	int _size;
+    int _proxPista;
   public:
   	/*!
   	 * @brief Construtor que cria um valor aleatório para o tamanho do veículo.
@@ -18,4 +19,7 @@
   	int getSize () {
   		return _size;
   	}
+    int getProxPista() {
+      return _proxPista;
+    }
  };

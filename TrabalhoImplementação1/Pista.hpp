@@ -10,7 +10,9 @@ class Pista : Fila<Carro*> {
 		int espaço; /*<! Inteiro que indica quanto espaço a pista "perdeu">*/
 		int vel; /*<! Inteiro que indica a velocidade da pista.>*/
 		int freq /*<! Inteiro que indica a frequencia que add um veículo*/
+		int tempoParaFim;
 		bool font, sum; /*<! Booleans para indicar se é fonte ou sumidouro.*/
+
 	public:
 		/*!
 		 * @brief Construtor basico da pista
@@ -62,5 +64,19 @@ class Pista : Fila<Carro*> {
 		 */
 		bool pistaCheia () {
 			return espaço == tam
+		}
+		int tempoChegada(Carro* carro) {	
+			int localCheg = carro->getSize() - tam - espaço;
+			int vels = vel / 3,6;
+			int tempo = 0;
+			if (localCheg > 0) {
+				while (vels != localcheg) {
+					vels +=vels;
+					tempo++;
+				}
+				return time;
+			} else {
+				throw "Impossivel chegar nesse local.";
+			}
 		}
 };
