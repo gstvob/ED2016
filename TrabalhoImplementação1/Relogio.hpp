@@ -1,7 +1,7 @@
 #include "Eventos.hpp"
 #include "ListaEnc.hpp"
 
-class Relogio: ListaEnc<Eventos> {
+class Relogio: ListaEnc<Eventos*> {
 
 private:
 public:
