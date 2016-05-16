@@ -46,6 +46,42 @@ public:
 
 		Pista* proxPistas1[3] = {c1l, o1o, s1s};
 		int prob1[3] = {80,10,10};
-		Semaforo* semaforo = new Semaforo(false,);
+		Semaforo* s1n = new Semaforo(false,n1s,prob1,semaTemp,proxPistas1);
+		semaforos->adiciona(s1n);
+
+		Pista* proxPistas2[3] = {c1l, n1n, s1s};
+		int prob2[3] = {80,10,10};
+		Semaforo* s1o = new Semaforo(false,o1l,prob2,semaTemp,proxPistas2);
+		semaforos->adiciona(s1o);
+
+		Pista* proxPistas3[3] = {c1l, o1o, n1n};
+		int prob3[3] = {80,10,10};
+		Semaforo* s1s = new Semaforo(false,s1n,prob3,semaTemp,proxPistas3);
+		semaforos->adiciona(s1s);
+
+		Pista* proxPistas4[3] = {o1o, n1n, s1s};
+		int prob4[3] = {40,30,30};
+		Semaforo* s1l = new Semaforo(false,c1o,prob4,semaTemp,proxPistas4);
+		semaforos->adiciona(s1l);
+
+		Pista* proxPistas5[3] = {l1l, n2n, s2s};
+		int prob5[3] = {40,30,30};
+		Semaforo* s2o = new Semaforo(false,c1l,prob5,semaTemp,proxPistas5);
+		semaforos->adiciona(s2o);
+
+		Pista* proxPistas6[3] = {l1l, c1o, s2s};
+		int prob6[3] = {40,30,30};
+		Semaforo* s2n = new Semaforo(false,n2s,prob6,semaTemp,proxPistas6);
+		semaforos->adiciona(s2n);
+
+		Pista* proxPistas7[3] = {l1l, n2n, c1o};
+		int prob7[3] = {40,30,30};
+		Semaforo* s2s = new Semaforo(false,s2n,prob7,semaTemp,proxPistas7);
+		semaforos->adiciona(s2s);
+
+		Pista* proxPistas8[3] = {l1l, n2n, s2s};
+		int prob8[3] = {40,30,30};
+		Semaforo* s2l = new Semaforo(false,c1o,prob8,semaTemp,proxPistas8);
+		semaforos->adiciona(s2l);
 	}
-}
+};

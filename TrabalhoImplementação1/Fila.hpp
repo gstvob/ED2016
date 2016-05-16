@@ -12,7 +12,7 @@
      * fila está cheia ou vazia etc.
      */
     class Fila {
-     private:
+     protected:
         T* m_dados; /*!<Ponteiro que vai receber os elementos da fila*/
         int ult; /*!<Inteiro que vai indicar a posição do ultimo elemento*/
         int TAMANHOFILA; /*!<Inteiro para indicar o tamanho da fila*/
@@ -81,6 +81,14 @@
          * ultima posição da fila, isso caso a fila não esteja vazia, se ela tiver é
          * jogada uma exceção.
         */
+
+      T primeiro() {
+        if (filaVazia()) {
+              throw("essa fila ta vazia como eu vo retorna o ultimo?");
+          } else {
+            return m_dados[0];
+        }
+      }
     	T ultimo() {
     	    if (filaVazia()) {
     	        throw("essa fila ta vazia como eu vo retorna o ultimo?");

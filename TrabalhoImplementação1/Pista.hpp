@@ -7,9 +7,9 @@
 class Pista : Fila<Carro*> {
 	protected:
 		int tam; /*<! Inteiro que indica o tamanho da pista>*/
-		int espaço; /*<! Inteiro que indica quanto espaço a pista "perdeu">*/
+		int espaco; /*<! Inteiro que indica quanto espaço a pista "perdeu">*/
 		int vel; /*<! Inteiro que indica a velocidade da pista.>*/
-		int freq /*<! Inteiro que indica a frequencia que add um veículo*/
+		int freq; /*<! Inteiro que indica a frequencia que add um veículo*/
 		int tempoParaFim;
 		bool font, sum; /*<! Booleans para indicar se é fonte ou sumidouro.*/
 
@@ -22,7 +22,7 @@ class Pista : Fila<Carro*> {
 		Pista(int _tam, int _vel, int _freq) {
 			tam = _tam;
 			vel = _vel;
-			espaço = 0;
+			espaco = 0;
 			freq = _freq;
 			if (freq == 0) {
 				sum = true;
@@ -43,11 +43,11 @@ class Pista : Fila<Carro*> {
 			if (pistaCheia()) {
 				throw "Erro: a pista está cheia";
 			} else {
-				if(espaço+car->getSize() <= tam) {
-					this->inclui(carro);
-					espaço = espaço + carro->getSize();
+				if(espaco+veiculo->getSize() <= tam) {
+					this->inclui(veiculo);
+					espaco = espaco + veiculo->getSize();
 				} else {
-					throw "erro: carro não cabe na pista";
+					throw "erro: veiculo não cabe na pista";
 				}
 			}
 		}
@@ -63,18 +63,22 @@ class Pista : Fila<Carro*> {
 		 * @return boolean que é verdadeiro se a pista esta cheia falso caso nao
 		 */
 		bool pistaCheia () {
-			return espaço == tam
+			return espaco == tam;
+		}
+
+		Carro* prim() {
+			return this->primeiro();
 		}
 		int tempoChegada(Carro* carro) {	
-			int localCheg = carro->getSize() - tam - espaço;
-			int vels = vel / 3,6;
+			int localCheg = carro->getSize() - tam - espaco;
+			int vels = vel/3.6;
 			int tempo = 0;
 			if (localCheg > 0) {
-				while (vels != localcheg) {
+				while (vels != localCheg) {
 					vels +=vels;
 					tempo++;
 				}
-				return time;
+				return tempo;
 			} else {
 				throw "Impossivel chegar nesse local.";
 			}

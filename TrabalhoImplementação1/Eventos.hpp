@@ -4,7 +4,7 @@ private:
 	int timer;
 	char type;
 public:
-	Eventos(int _timer. int _type) {
+	Eventos(int _timer, int _type) {
 		timer = _timer;
 		type = _type;
 	}
@@ -14,4 +14,4 @@ public:
 	int getType() {
 		return type;
 	}
-}
+};
