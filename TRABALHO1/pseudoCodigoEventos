@@ -1,0 +1,12 @@
+ classe eventos {
+
+ 	protegido:
+ 		bool chegadaDeUmNovoCarro
+ 		bool mudançaDeEstadoDoSemáforo
+ 		bool chegada de carro ao semaforo.
+ 		bool troca de pista.
+ 	publico :
+ 		Eventos() {
+ 			tudo = false;
+  		}
+ }

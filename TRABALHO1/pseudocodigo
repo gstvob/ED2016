@@ -1,0 +1,25 @@
+#inclui carros
+#inclui filadevetores
+
+class Pista:filavetores<carros> {
+	
+	privado
+		inteiro velocidade
+		inteiro tamanho
+		//! se for uma fonte
+		inteiro frequencia
+		inteiro tamanhoocupado
+
+	publico
+		Pista() {
+			velocidade velocidade da pista
+			tamanho = tamanho da pista
+			//! se for uma fonte gera uma frequencia "aleatoria"
+			tamanhoocupado = 0;
+		}
+		método da fila de vetor adiciona() {
+n
+		}
+
+
+}

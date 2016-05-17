@@ -26,7 +26,7 @@ public:
 	Semaforo(bool open,Pista* pistaL, int *_probs ,int tempo, Pista* eferentes[]) {
 		aberto = open;
 		timer = tempo;
-		opentimer = 0;
+		opentimer = 10;
 		probs = probs;
 		pistas = new Lista<Pista*>(3);
 		pistaDele = pistaL;
@@ -69,11 +69,12 @@ public:
  * @param inteiro que indica o tempo que o semaforo vai abrir ou fechar.
  */
 
-	void AbreFecha(int tempo) {
-		if (aberto) {
-			NextEvent(tempo);
+	void AbreFecha() {
+		if (aberto == true) {
+			aberto = false;
+		} else {
+			aberto = true;
 		}
-		aberto = !aberto;
 	}
 /*!
  * @brief método para calcular a proxima pista que o primeiro carro da fila vai.
@@ -100,5 +101,8 @@ public:
 	}
 	bool isOpen() {
 		return aberto;
+	}
+	int getOpenTimer() {
+		return opentimer;
 	}
 };

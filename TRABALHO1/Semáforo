@@ -1,0 +1,23 @@
+classe semáforo {
+	
+	privado :
+		boolean aberto;
+		inteiro tempoAbrir;
+		ListaVetor<Pista>* pistasAferentes;
+		ListaVetor<Pista>* pistasEferentes;
+
+	publico:
+		Semáforo(inteiro _tempoAbrir) {
+			tempoAbrir = _tempoAbrir;
+			aberto = false;
+			
+		}
+
+		método abrirSemáforo() {
+			aberto = true;
+		}
+		método fecharSemáforo() {
+			aberto = false;
+		}
+
+}

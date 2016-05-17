@@ -25,4 +25,11 @@ public:
 	void adicionaEvento(Eventos* ev) {
 		this->adicionaEmOrdem(ev);
 	}
+
+	int quantidadeEventos() {
+		return this->size;
+	}
+	Eventos* mostrar(int pos) {
+		return this->mostra(pos);
+	}
 };

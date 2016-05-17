@@ -190,6 +190,22 @@ class ListaEnc {
 	        throw "ERROELEMENTOINEXISTENTE";
 	    }
 	}
+	T mostra(int pos) const {
+	    Elemento<T> *atual;
+	    T data;
+	    int anda;
+	    if (listaVazia()) {
+	        throw "ERROLISTAVAZIA";
+	    } else {
+	        atual = head;
+	        anda = 1;
+	        while (anda <= pos) {
+				atual = atual->getProximo();
+	        }
+	        data = atual->getInfo();
+	        return data;
+	    }
+	}
 //! Método de retorno booleano para saber se um dado existe na lista.
 /*!
  * @param dado, o endereço da memoria de um generico.

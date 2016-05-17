@@ -1,0 +1,13 @@
+#incluir <stdlib.h>
+#incluir <time.h>
+classe Carro {
+	privado :
+		inteiro tamanho;
+	publico :
+		Carro() {
+			gera um valor aleatório para tamanho;
+		}
+		inteiro getTamanho() {
+			retorna o tamanho;
+		}
+}

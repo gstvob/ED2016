@@ -1,0 +1,47 @@
+#inclui carros
+#inclui filadevetores
+#inclui semáforo
+class Pista:filavetores<carros> {
+	
+	privado
+		inteiro velocidade
+		inteiro tamanho
+		inteiro frequencia
+		inteiro tamanhoocupado
+		boolean sumidouro, fonte.
+		Semáforo semaf;
+
+	publico
+		Pista(inteiro _velocidade, inteiro _tamanho) {
+			velocidade = _velocidade;
+			tamanho = _tamanho
+			tamanhoocupado = 0;
+			se frequencia for igual a zero então
+				sumidouro = verdade;
+				fonte = falso;
+			ou se a frequencia for igual a 1 então
+				sumidouro = falso;
+				fonte = falso;
+			senão
+				sumidouro = falso;
+				fonte = true;
+		}
+		método adicionaCarro(Carro* carro) {
+
+			se a pista estiver cheia então
+				não adiciona o carro
+			senão se a o tamanho ocupado + o tamanho do carro ultrapassar o tamanho então
+				não adiciona carro também
+			senão
+				chamaométodo de adicionar da fila de vetores.
+			fim se;
+
+		}
+
+		método retiraCarro() {
+			simplesmente chama o método de retirar da fila de vetores;
+		}
+		método pistaCheia() {
+			retorna tamanhoocupado == tamanho.
+		}
+}

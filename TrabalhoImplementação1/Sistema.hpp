@@ -1,20 +1,21 @@
 #include "Semaforo.hpp"
 #include "Relogio.hpp"
-#include "ListaCirc.hpp"
+#include <iostream>
 
 class Sistema {
 
 private:
-	ListaEnc<Semaforo*>* semaforos;
+	ListaCirc<Semaforo*>* semaforos;
 	ListaCirc<Pista*>* pistas;
 	Relogio* relogio;
 	int tempoEx;
 	int tempoA;
 	int semaTemp;
-
+	int contador1;
+	int contador2;
 public:
 	Sistema(int _tempoEx, int _semaTemp) {
-		semaforos = new ListaEnc<Semaforo*>();
+		semaforos = new ListaCirc<Semaforo*>();
 		pistas = new ListaCirc<Pista*>();
 		relogio = new Relogio();
 		tempoEx = _tempoEx;
@@ -45,41 +46,224 @@ public:
 		Pista* proxPistas1[3] = {Pc1l, Po1o, Ps1s};
 		int prob1[3] = {80,10,10};
 		Semaforo* s1n = new Semaforo(false,Pn1s,prob1,semaTemp,proxPistas1);
-		semaforos->adiciona(s1n);
 
 		Pista* proxPistas2[3] = {Pc1l, Pn1n, Ps1s};
 		int prob2[3] = {80,10,10};
 		Semaforo* s1o = new Semaforo(false,Po1l,prob2,semaTemp,proxPistas2);
-		semaforos->adiciona(s1o);
 
 		Pista* proxPistas3[3] = {Pc1l, Po1o, Pn1n};
 		int prob3[3] = {80,10,10};
 		Semaforo* s1s = new Semaforo(false,Ps1n,prob3,semaTemp,proxPistas3);
-		semaforos->adiciona(s1s);
-
+		
 		Pista* proxPistas4[3] = {Po1o, Pn1n, Ps1s};
 		int prob4[3] = {40,30,30};
 		Semaforo* s1l = new Semaforo(false,Pc1o,prob4,semaTemp,proxPistas4);
-		semaforos->adiciona(s1l);
 
 		Pista* proxPistas5[3] = {Pl1l, Pn2n, Ps2s};
 		int prob5[3] = {40,30,30};
 		Semaforo* s2o = new Semaforo(false,Pc1l,prob5,semaTemp,proxPistas5);
-		semaforos->adiciona(s2o);
 
 		Pista* proxPistas6[3] = {Pl1l, Pc1o, Ps2s};
 		int prob6[3] = {40,30,30};
 		Semaforo* s2n = new Semaforo(false,Pn2s,prob6,semaTemp,proxPistas6);
-		semaforos->adiciona(s2n);
 
 		Pista* proxPistas7[3] = {Pl1l, Pn2n, Pc1o};
 		int prob7[3] = {40,30,30};
 		Semaforo* s2s = new Semaforo(false,Ps2n,prob7,semaTemp,proxPistas7);
-		semaforos->adiciona(s2s);
 
 		Pista* proxPistas8[3] = {Pl1l, Pn2n, Ps2s};
 		int prob8[3] = {40,30,30};
 		Semaforo* s2l = new Semaforo(false,Pc1o,prob8,semaTemp,proxPistas8);
+		semaforos->adiciona(s1n);
+		semaforos->adiciona(s2n);
+		semaforos->adiciona(s1l);
 		semaforos->adiciona(s2l);
+		semaforos->adiciona(s1s);
+		semaforos->adiciona(s2s);
+		semaforos->adiciona(s1o);
+		semaforos->adiciona(s2o);
+
+	}
+
+
+	void GeraCarros() {
+		Pista* pist[14];
+		Carro* novoCarro = new Carro();
+		int proxE;
+		int tempDiscreto;
+		for (int i = 0; i < 14; i++) {
+			pist[i] = pistas->mostra(i);
+		}
+		for (int j = 0; j < 14; j++) {
+			if (pist[j]->getFonte() == true) {
+				tempDiscreto = tempoA;
+			}
+			for (int k = tempDiscreto; k < tempoEx; k++) {
+				proxE = pist[j]->tempoChegada(novoCarro) + tempoA;
+
+				if (proxE <= tempoEx) {
+					Eventos* novo = new Eventos(proxE,'c');
+					relogio->adicionaEvento(novo);
+					tempDiscreto = proxE;
+				} else {
+					break;
+				}
+				throw "ERROR";
+			}
+		}
+	}
+	void AbreSemaforo(){
+		Semaforo* semaforo1;
+    	Semaforo* semaforo2;
+    	Eventos* evento;
+    	Eventos* evento2;
+    	int proxE, tempDiscreto;
+
+    	semaforo1 = semaforos->mostra(contador1);
+    	semaforo2 = semaforos->mostra(contador1 + 1);
+
+    	proxE = semaforo1->NextEvent(semaTemp);
+
+    	if (proxE <= tempoEx) {
+    		evento = new Eventos(proxE, 'a');
+    		evento2 = new Eventos(proxE, 'a');
+    		relogio->adicionaEvento(evento);
+    		relogio->adicionaEvento(evento2);
+    		contador1 += 2;
+ 		}
+    	tempDiscreto = proxE;
+	}
+	void FechaSemaforo(){
+		Semaforo* semaforo1;
+    	Semaforo* semaforo2;
+    	Eventos* evento;
+    	Eventos* evento2;
+    	int proxE, tempDiscreto;
+
+    	semaforo1 = semaforos->mostra(contador2);
+    	semaforo2 = semaforos->mostra(contador2+1);
+
+    	proxE = semaforo1->NextEvent(semaforo1->getOpenTimer());
+
+    	if (proxE <= tempoEx) {
+    		evento = new Eventos(proxE, 'f');
+    		evento2 = new Eventos(proxE, 'f');
+    		relogio->adicionaEvento(evento);
+    		relogio->adicionaEvento(evento2);
+    		contador2 += 2;
+   		}
+    	tempDiscreto = proxE;
+	}
+	void CarroSome() {
+		Pista* pista[6];
+		for (int i = 0; i < 14; i++) {
+			pista[i] = pistas->mostra(i);
+			if (pista[i]->getSumi() == true) {
+				Carro* carroDelete = pista[i]->prim();
+				int proxE;
+				int tempDiscreto;
+				tempDiscreto = tempoA;
+				proxE = pista[i]->tempoChegada(carroDelete);
+				if (proxE <= tempoEx) {
+					Eventos* evento = new Eventos(proxE,'s');
+					tempDiscreto = proxE;
+					relogio->adicionaEvento(evento);
+				}
+				throw "ERRO";
+			}
+		}
+	}
+	void CarroPassa() {
+		Semaforo* semaforo[8];
+		for (int i = 0; i < 8; i++) {
+			semaforo[i] = semaforos->mostra(i);
+			if (semaforo[i]->isOpen() == true) {
+				Carro* carro = semaforo[i]->getPistaLocal()->prim();
+				int proxE;
+				int tempDiscreto;
+				tempDiscreto = tempoA;
+				proxE = semaforo[i]->ProxPista()->tempoChegada(carro);
+				if (proxE <= tempoEx) {
+					Eventos* evento = new Eventos(proxE, 'p');
+					tempDiscreto = proxE;
+					relogio->adicionaEvento(evento);
+				}
+			}
+		}
+	}
+	void ExecutarEventos() {
+		for (int i = 0; i < relogio->quantidadeEventos(); i++) {
+			Eventos* event = relogio->mostrar(i);
+			while (tempoA <= tempoEx) {
+				if (event->getType() == 'c') {
+					Pista* pista;
+					for (int j = 0; j < 14; j++) {
+						pista = pistas->mostra(j);
+						if (pista->getFonte() == true and pista->pistaCheia() == false) {
+							pista->AddCar(new Carro());
+							tempoA = event->getTimer();
+						}
+					}	
+				} else if (event->getType() == 'a') {
+					Semaforo* semaforo1;
+					Semaforo* semaforo2;
+
+					semaforo1 = semaforos->mostra(contador1);
+					semaforo2 = semaforos->mostra(contador1+1);
+
+					semaforo1->AbreFecha();
+					semaforo2->AbreFecha();
+				} else if (event->getType() == 'f') {
+					Semaforo* semaforo1;
+					Semaforo* semaforo2;
+
+					semaforo1 = semaforos->mostra(contador2);
+					semaforo2 = semaforos->mostra(contador2 + 1);
+
+					semaforo1->AbreFecha();
+					semaforo2->AbreFecha();
+				} else if (event->getType() == 's') {
+					Pista* pista;
+					for (int k = 0; k < 14; k++) {
+						pista = pistas->mostra(i);
+						if (pista->getSumi() == true) {
+							pista->RemoveCar();
+						}
+					}
+				} else if (event->getType() == 'p') {
+					Semaforo* semaforo;
+					Pista* pista;
+					for (int l = 0 ; l < 8; l++) {
+						semaforo = semaforos->mostra(i);
+						if (semaforo->isOpen() == true) {
+							semaforo->ProxPista();
+						}
+					}
+				}
+			}
+		}
+		std::cout << "FIM DA EXECUÇÃO";
+	}
+	void GeraEventos() {
+		GeraCarros();
+		AbreSemaforo();
+		CarroPassa();
+		FechaSemaforo();
+		CarroSome();
+		AbreSemaforo();
+		CarroPassa();
+		FechaSemaforo();
+		CarroSome();
+		AbreSemaforo();
+		CarroPassa();
+		FechaSemaforo();
+		CarroSome();
+		AbreSemaforo();
+		CarroPassa();
+		FechaSemaforo();
+		CarroSome();
+
+		ExecutarEventos();
 	}
 };
+
