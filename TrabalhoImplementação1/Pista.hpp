@@ -11,6 +11,7 @@ class Pista : Fila<Carro*> {
 		int vel; /*<! Inteiro que indica a velocidade da pista.>*/
 		int freq; /*<! Inteiro que indica a frequencia que add um veículo*/
 		int tempoParaFim;
+		int carrosPassados,carrosSaidos;
 		bool font, sum; /*<! Booleans para indicar se é fonte ou sumidouro.*/
 
 	public:
@@ -46,6 +47,7 @@ class Pista : Fila<Carro*> {
 				if(espaco+veiculo->getSize() <= tam) {
 					this->inclui(veiculo);
 					espaco = espaco + veiculo->getSize();
+					carrosPassados++;
 				} else {
 					throw "erro: veiculo não cabe na pista";
 				}
@@ -57,6 +59,7 @@ class Pista : Fila<Carro*> {
 		 */
 		void RemoveCar(){
 			this->retira();
+			carrosSaidos++;
 		}
 		/*!
 		 * @brief método para saber se a pista está cheia.
@@ -101,5 +104,11 @@ class Pista : Fila<Carro*> {
 
 		bool getSumi() {
 			return sum;
+		}
+		int getCarrosPass() {
+			return carrosPassados;
+		}
+		int getCarrosSai(){
+			return carrosSaidos;
 		}
 };

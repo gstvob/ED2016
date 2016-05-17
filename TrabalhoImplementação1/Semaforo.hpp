@@ -30,9 +30,9 @@ public:
 		probs = probs;
 		pistas = new Lista<Pista*>(3);
 		pistaDele = pistaL;
-		for (int i = 0; i < 3; i++) {
-			pistas->adiciona(eferentes[i]);
-		}
+		//for (int i = 0; i < 3; i++) {
+		//	pistas->adiciona(eferentes[i]);
+		//}
 	}
 /*!
  * @brief método que retorna um numero para saber a proxima pista que o carro vai.

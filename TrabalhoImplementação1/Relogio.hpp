@@ -25,7 +25,9 @@ public:
 	void adicionaEvento(Eventos* ev) {
 		this->adicionaEmOrdem(ev);
 	}
-
+	void retiraEvento(Eventos* ev) {
+		this->retiraEspecifico(ev);
+	}
 	int quantidadeEventos() {
 		return this->size;
 	}

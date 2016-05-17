@@ -20,6 +20,7 @@ public:
 		relogio = new Relogio();
 		tempoEx = _tempoEx;
 		semaTemp = _semaTemp;
+		TrafficSim();
 	}
 	void TrafficSim () {
 		Pista* Pn1s = new Pista(500,60,15);
@@ -102,13 +103,12 @@ public:
 				proxE = pist[j]->tempoChegada(novoCarro) + tempoA;
 
 				if (proxE <= tempoEx) {
-					Eventos* novo = new Eventos(proxE,'c');
+					Eventos* novo = new Eventos(proxE, 0);
 					relogio->adicionaEvento(novo);
 					tempDiscreto = proxE;
 				} else {
 					break;
 				}
-				throw "ERROR";
 			}
 		}
 	}
@@ -125,8 +125,8 @@ public:
     	proxE = semaforo1->NextEvent(semaTemp);
 
     	if (proxE <= tempoEx) {
-    		evento = new Eventos(proxE, 'a');
-    		evento2 = new Eventos(proxE, 'a');
+    		evento = new Eventos(proxE, 1);
+    		evento2 = new Eventos(proxE, 1);
     		relogio->adicionaEvento(evento);
     		relogio->adicionaEvento(evento2);
     		contador1 += 2;
@@ -146,8 +146,8 @@ public:
     	proxE = semaforo1->NextEvent(semaforo1->getOpenTimer());
 
     	if (proxE <= tempoEx) {
-    		evento = new Eventos(proxE, 'f');
-    		evento2 = new Eventos(proxE, 'f');
+    		evento = new Eventos(proxE, 2);
+    		evento2 = new Eventos(proxE, 2);
     		relogio->adicionaEvento(evento);
     		relogio->adicionaEvento(evento2);
     		contador2 += 2;
@@ -165,11 +165,10 @@ public:
 				tempDiscreto = tempoA;
 				proxE = pista[i]->tempoChegada(carroDelete);
 				if (proxE <= tempoEx) {
-					Eventos* evento = new Eventos(proxE,'s');
+					Eventos* evento = new Eventos(proxE,3);
 					tempDiscreto = proxE;
 					relogio->adicionaEvento(evento);
 				}
-				throw "ERRO";
 			}
 		}
 	}
@@ -184,7 +183,7 @@ public:
 				tempDiscreto = tempoA;
 				proxE = semaforo[i]->ProxPista()->tempoChegada(carro);
 				if (proxE <= tempoEx) {
-					Eventos* evento = new Eventos(proxE, 'p');
+					Eventos* evento = new Eventos(proxE, 4);
 					tempDiscreto = proxE;
 					relogio->adicionaEvento(evento);
 				}
@@ -194,8 +193,8 @@ public:
 	void ExecutarEventos() {
 		for (int i = 0; i < relogio->quantidadeEventos(); i++) {
 			Eventos* event = relogio->mostrar(i);
-			while (tempoA <= tempoEx) {
-				if (event->getType() == 'c') {
+			if (tempoA <= tempoEx) {
+				if (event->getType() == 0) {
 					Pista* pista;
 					for (int j = 0; j < 14; j++) {
 						pista = pistas->mostra(j);
@@ -204,7 +203,7 @@ public:
 							tempoA = event->getTimer();
 						}
 					}	
-				} else if (event->getType() == 'a') {
+				} else if (event->getType() == 1) {
 					Semaforo* semaforo1;
 					Semaforo* semaforo2;
 
@@ -213,7 +212,7 @@ public:
 
 					semaforo1->AbreFecha();
 					semaforo2->AbreFecha();
-				} else if (event->getType() == 'f') {
+				} else if (event->getType() == 2) {
 					Semaforo* semaforo1;
 					Semaforo* semaforo2;
 
@@ -222,7 +221,7 @@ public:
 
 					semaforo1->AbreFecha();
 					semaforo2->AbreFecha();
-				} else if (event->getType() == 's') {
+				} else if (event->getType() == 3) {
 					Pista* pista;
 					for (int k = 0; k < 14; k++) {
 						pista = pistas->mostra(i);
@@ -230,7 +229,7 @@ public:
 							pista->RemoveCar();
 						}
 					}
-				} else if (event->getType() == 'p') {
+				} else if (event->getType() == 4) {
 					Semaforo* semaforo;
 					Pista* pista;
 					for (int l = 0 ; l < 8; l++) {
@@ -241,8 +240,9 @@ public:
 					}
 				}
 			}
+			relogio->retiraEvento(event);
 		}
-		std::cout << "FIM DA EXECUÇÃO";
+		Saida();
 	}
 	void GeraEventos() {
 		GeraCarros();
@@ -264,6 +264,23 @@ public:
 		CarroSome();
 
 		ExecutarEventos();
+	}
+
+	void Saida() {
+		int carrosQueEntraram = 0;
+        int carrosQueSairam = 0;
+		for (int i = 0; i < 14; i++) {
+        Pista* pista = pistas->mostra(i);
+       		if (pista->getFonte()) {
+            	carrosQueEntraram = carrosQueEntraram + pista->getCarrosPass();
+        	} else {
+            	if (pista->getSumi()) {
+                	carrosQueSairam = carrosQueSairam + pista->getCarrosSai();
+            	}
+        	}
+    	}
+    	std::cout << "Carros que entraram no sistema: " << carrosQueEntraram << std::endl;
+    	std::cout << "Carros que sairam do sistema: " << carrosQueSairam << std::endl;
 	}
 };
 

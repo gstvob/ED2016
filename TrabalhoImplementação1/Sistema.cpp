@@ -11,5 +11,6 @@ int main() {
 		cin >> semaTemp;
 		Sistema* sistema = new Sistema(tempoEx, semaTemp);
 		sistema->GeraEventos();
+		cout << "THE FIM";
 		return 0;
 	}
