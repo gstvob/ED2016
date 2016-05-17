@@ -65,10 +65,18 @@ class Pista : Fila<Carro*> {
 		bool pistaCheia () {
 			return espaco == tam;
 		}
-
+		/*!
+		 * @brief retorna o primeiro carro da fila.
+		 * @return Carro*, ponteiro que indica o carro que está em primeiro lugar na fila.
+		 */
 		Carro* prim() {
 			return this->primeiro();
 		}
+		/*!
+		 * @brief Retorna o tempo que um carro demora para chegar em um semaforo.
+		 * @param carro, o carro que se quer saber o tempo de chegada.
+		 * @return inteiro que indica o tempo que o carro demorou para chegar no fim da fila.
+		 */
 		int tempoChegada(Carro* carro) {	
 			int localCheg = carro->getSize() - tam - espaco;
 			int vels = vel/3.6;
@@ -82,5 +90,16 @@ class Pista : Fila<Carro*> {
 			} else {
 				throw "Impossivel chegar nesse local.";
 			}
+		}
+		/*!
+		 * @brief método para retornar se o pista é uma fonte ou não.
+		 * @return booleano verdadeiro se a pista for fonte, falso caso não.
+		 */
+		bool getFonte() {
+			return font;
+		}
+
+		bool getSumi() {
+			return sum;
 		}
 };
