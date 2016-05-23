@@ -1,9 +1,0 @@
-
-classe carro {
-	protegido :
-		inteiro tamanho
-	publico:
-		carro() {
-			tamanho = tamanho dele + 3;
-		}
-}

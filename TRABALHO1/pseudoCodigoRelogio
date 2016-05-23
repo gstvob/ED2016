@@ -1,7 +1,0 @@
-#inclui listaEncadeada
-#inclui eventos
-
-classe relogio : ListaEncadeada<Eventos>{
-	private :
-		
-}
