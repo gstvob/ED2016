@@ -56,6 +56,13 @@ public:
 		}
 	}
 
+	void AbreFecha() {
+		if (aberto == true) {
+			aberto = false;
+		} else {
+			aberto = true;
+		}
+	}
 //o método aqui para escolher a pista aleatoriamente do carro e talz
 	void escolhePista() {
 		Carro* carro = local->primeiro();
