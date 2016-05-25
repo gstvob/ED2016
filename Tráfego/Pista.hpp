@@ -1,3 +1,4 @@
+/*Copyright Gustavo Borges && Nathan Werlich*/
 #include "Carro.hpp"
 #include "Fila.hpp"
 #include "Eventos.hpp"
@@ -44,20 +45,66 @@ public:
 		if (pistaCheia()) {
 			std::cout << "um carro foi impedido de mudar de pista" << std::endl;
 		} else {
-			this->inclui(carro);
-			carrosQueEntraram++;
+			if (carro->getTamanho() + espacoOcupado == tamanho) {
+				throw "ERRO";
+			} else {
+				this->inclui(carro);
+				carrosQueEntraram++;
+			}
 		}
 	}
-
-	Eventos* gerarCarros(int currentTime) {
+	/*!
+	 * @brief método para marcar o evento de um carro chegando ao fim de uma pista.
+	 * @param inteiro que indica o tempo atual que se encontra o programa.
+	 * @return ponteiro do tipo eventos.
+	 * @see tempoParaChegaoAoFimSumidouro(). gerarCarros().
+	 */
+	Eventos* tempoParaChegarAoFim(int currentTime) {
 		Eventos* ev;
 		if (this->pistaCheia() == true) {
-			return ev = new Eventos(0,0);
+			return ev = new Eventos(0,0,nullptr);
 		} else {
-			ev = new Eventos(frequencia+currentTime, 1);
+			Carro* carro = this->primeiro();
+			int tempo = this->chegarAoFim(carro);
+			ev = new Eventos(tempo+currentTime, 4,this);
 			return ev;
 		}
 	}
+	/*!
+	 * @brief Método para marcar o evento de um carro chegando ao fim de um sumidouro.
+	 * @param inteiro que indica o tempo atual do programa.
+	 * @see tempoParaChegarAoFim(), GerarCarros().
+	 */
+	Eventos* tempoParaChegarAoFimSumidouro(int currentTime) {
+		Eventos* ev;
+		if (this->pistaCheia() == true || this->isSumidouro() == false) {
+			return ev = new Eventos(0,0,nullptr);
+		} else {
+			Carro* carro = this->primeiro();
+			int tempo = this->chegarAoFim(carro);
+			ev = new Eventos(tempo+currentTime, 3, this);
+			return ev;
+		}
+	}
+	/*!
+	 * @brief método para gerar carros nas pistas fontes.
+	 * @param inteiro que indica o tempo atual do programa.
+	 * @see tempoParaChegarAoFim(). tempoParaChegarAoFimSumidouro().
+	 */
+	Eventos* gerarCarros(int currentTime) {
+		Eventos* ev;
+		if (this->pistaCheia() == true) {
+			return ev = new Eventos(0,0,nullptr);
+		} else {
+			ev = new Eventos(frequencia+currentTime, 1,this);
+			return ev;
+		}
+	}
+	/*!
+	 * @brief método que calcula o tempo para um carro chegar ao fim de uma pista.
+	 * @param ponteiro de carro
+	 * @return inteiro que é o tempo que o carro demora para chegar ao fim.
+	 */
 	int chegarAoFim(Carro* carro) {
 		int localCheg = carro->getTamanho() - tamanho - espacoOcupado;
 		int vels = velocidade/3.6;
@@ -80,6 +127,7 @@ public:
 		if (pistaVazia()) {
 			throw "ERROPISTAVAZIA";
 		} else {
+			espacoOcupado = espacoOcupado - this->primeiro()->getTamanho();
 			return this->retira();
 			carrosQueSairam++;
 		}
@@ -140,5 +188,11 @@ public:
 	 */
 	int getFrequencia() {
 		return frequencia;
+	}
+	int getCarrosEntraram() {
+		return carrosQueEntraram;
+	}
+	int getCarrosQueSairam() {
+		return carrosQueSairam;
 	}
 };

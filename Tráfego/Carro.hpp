@@ -1,3 +1,4 @@
+/*Copyright Gustavo Borges && Nathan Werlich*/
 #include <cstdlib>
 
 /*!
@@ -12,9 +13,7 @@ public:
 	/*!
 	 * @brief Construtor que incializa o tamanho do carro e para qual pista ele vai depois.
 	 */
-	Carro(int _tamanho, int _nextPista) {
-		tamanho = _tamanho;
-		nextPista = _nextPista;
+	Carro() {
 	}
 	/*!
 	 * @brief Getter da proxima pista que o carro irá.
@@ -29,5 +28,12 @@ public:
 	 */
 	int getTamanho() {
 		return tamanho;
+	}
+	/*!
+	 * @brief método para setar a proxima pista do carro.
+	 * @param inteiro que vai indicar a proxima da pista do carro.
+	 */
+	void setProxPista(int _nextPista) {
+		nextPista = _nextPista;
 	}
 };

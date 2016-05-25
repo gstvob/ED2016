@@ -1,3 +1,4 @@
+/*Copyright Gustavo Borges && Nathan Werlich*/
 #include "Semaforo.hpp"
 #include "ListaEnc.hpp"
 
@@ -25,12 +26,25 @@ public:
 	void adicionaEvento(Eventos* ev) {
 		this->adicionaEmOrdem(ev);
 	}
+	/*!
+	 * @brief método para retirar um evento especifico da lista de eventos.
+	 * @param ponteiro de evento que é o evento que se quer tirar da lista.
+	 */
 	void retiraEvento(Eventos* ev) {
 		this->retiraEspecifico(ev);
 	}
+	/*!
+	 * @brief método para saber a quantidade de eventos
+	 * @return que indica a quantidade de eventos na lista.
+	 */
 	int quantidadeEventos() {
 		return this->size;
 	}
+	/*!
+	 * @brief método que quando passado uma posição retorna um elemento.
+	 * @param inteiro que é a posição de um evento.
+	 * @return ponteiro de eventos que é o evento que está na posição do param.
+	 */
 	Eventos* mostrar(int pos) {
 		return this->mostra(pos);
 	}
