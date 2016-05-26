@@ -1,4 +1,4 @@
-//! Copyright 2016 Gustavo Borges França
+//! Copyright 2016 Gustavo Borges França && Nathan Werlich
 #include "Elemento.hpp"
 template <typename T>
 //! Classe de implementação de uma Lista Circular Simples.

@@ -1,6 +1,8 @@
-/*Copyright Gustavo Borges && Nathan Werlich*/
+/*Copyright Gustavo Borges && Nathan Werlich 2016*/
 #include "Pista.hpp"
 #include "Lista.hpp"
+#include <stdlib.h>
+#include <time.h>
 
 /*!
  * @brief classe de implementação dos semaforos da pista.
@@ -39,15 +41,9 @@ public:
 	 */
 	Eventos* passaSemaforo(int currentTime) {
 		Eventos* ev;
-		Carro* carro = local->primeiro();
-		Pista* proxPista = eferentes->mostra(carro->getNextPista());
-		if (proxPista->pistaCheia() == false) {
-			ev = new Eventos(currentTime+1, 2, this);
-			return ev;
-		} else {
-			ev = new Eventos(0,0,nullptr);
-			return ev;
-		}
+		ev = new Eventos(currentTime+1, 2, this);
+		currentTime += 1;
+		return ev;
 	}
 	/*!
 	 * @brief método para abrir e fechar o semaforo.
@@ -58,10 +54,6 @@ public:
 		} else {
 			aberto = true;
 		}
-	}
-//o método aqui para escolher a pista aleatoriamente do carro e talz
-	void escolhePista() {
-		Carro* carro = local->primeiro();
 	}
 	/*!
 	 * @brief método para saber se o semaforo está aberto ou fechado.
@@ -83,6 +75,7 @@ public:
 	 */
 	Pista* nextPista() {
 		Carro* carro = local->primeiro();
+		carro->setProxPista(carro->calculaProxPista(probs));
 		Pista* proxPista = eferentes->mostra(carro->getNextPista());
 		return proxPista;
 	}

@@ -1,4 +1,4 @@
-//! Copyright 2016 Gustavo Borges França
+//! Copyright 2016 Gustavo Borges França && Nathan Werlich
 #ifndef ELEMENTO_HPP
 #define ELEMENTO_HPP
 template<typename T>

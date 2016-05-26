@@ -1,4 +1,5 @@
-/*Copyright Gustavo Borges && Nathan Werlich*/
+/*Copyright Gustavo Borges && Nathan Werlich 2016*/
+
 #include "ListaCirc.hpp"
 #include "Relogio.hpp"
 #include <iostream>
@@ -13,8 +14,10 @@ private:
 	ListaCirc<Semaforo*>* semaforos; //! < Lista circular de todos os semaforos
 	int tempoParaAbertura;  //! inteiro que indica o tempo de abertura, e por consequencia
 							// o de fechamento dos semáforos.
-	int tempoExecucao;  //! Tempo que o sistema rodará, passado pelo usuario
-	int tempoAtual;  //! Tempo atual que o sistema se encontra.
+	int tempoExecucao;  //! < Tempo que o sistema rodará, passado pelo usuario
+	int tempoAtual = 0;  //! < Tempo atual que o sistema se encontra.
+	int carrosQueEntraram = 0;  //! < inteiro que indica o total de carros que entraram no sistema.
+	int carrosQueSairam = 0;  //! < inteiro que indica o total de carros que sairam do sistema.
 public:
 	/*!
 	 * @brief Construtor do sistema
@@ -32,6 +35,8 @@ public:
 	}
 	/*!
 	 * @brief método que inicializa as pistas, semaforos, probabilidades e etc.
+	 * @see RodarTudo()
+	 * @see GerarEventos()
 	 */
 	void simulacao() {
 		Pista* Pn1s = new Pista(500,60,15);
@@ -98,142 +103,157 @@ public:
 	}
 	/*!
 	 * @brief método para gerar todos os eventos do sistema.
+	 * @see RodarTudo()
+	 * @see simulacao()
 	 */
 	void GerarEventos() {
-		int temporizacao = tempoAtual;
-		while (temporizacao < tempoExecucao) {
-			for (int i = 0; i < 14; i++) {
-				Pista* pista = pistas->mostra(i);
-				if (pista->pistaCheia()) {
-					std::cout<<"Pista "<< (i+1) << " engarrafada" << std::endl; 
-				} else if (pista->isFont() == true) {
-					Eventos* ev = pista->gerarCarros(temporizacao);
-					Eventos* ev2 = pista->tempoParaChegarAoFim(temporizacao);
-					relogio->adicionaEvento(ev);
-					relogio->adicionaEvento(ev2);
-					temporizacao = ev->getTimer() + temporizacao;
-				} else if (pista->isSumidouro() == true) {
-					Eventos* ev = pista->tempoParaChegarAoFimSumidouro(temporizacao);
-					relogio->adicionaEvento(ev);
-					temporizacao = ev->getTimer() + temporizacao;
+		int temporizacao1 = 0;
+		Pista* pista;
+		Semaforo* semaforo;
+		for(int i = 0; i < 14; i++) {
+			pista = pistas->mostra(i);
+			if(pista->isFont() == true) {
+				while(temporizacao1 < tempoExecucao) {
+					Eventos* ev = pista->gerarCarros(temporizacao1);
+					relogio->adicionaEmOrdem(ev);
+					temporizacao1 = ev->getTimer();
 				}
-			}
-			for (int j = 0; j < 8; j++) {
-				Semaforo* semaforo = semaforos->mostra(j);
-				if (semaforo->isOpen() == true) {
-					Eventos* ev = semaforo->passaSemaforo(temporizacao);
-					Eventos* ev2 = semaforo->getLocal()->tempoParaChegarAoFim(temporizacao);
-					relogio->adicionaEvento(ev);
-					relogio->adicionaEvento(ev2);
-					temporizacao = ev->getTimer() + temporizacao;
-				}
-			}
-			abreFechaSemaforo(temporizacao);
-		}
-	}
-	/*!
-	 * @brief método para gerar os eventos de abrir e fechar semaforos.
-	 * @param tempo, o tempo que o sistema se encontra.
-	 */
-	void abreFechaSemaforo(int tempo) {
-		Eventos* ev1;
-		Eventos* ev2;
-		Eventos* ev3;
-		Eventos* ev4;
-		Semaforo* semaforo1;
-		Semaforo* semaforo2;
-		Semaforo* semaforo3;
-		Semaforo* semaforo4;
-		for (int i = 0; i < 8; i+=2) {
-			semaforo1 = semaforos->mostra(i);
-			semaforo2 = semaforos->mostra(i+1);
-			if (i >= 2) {
-				semaforo3 = semaforos->mostra(i-2);
-				semaforo4 = semaforos->mostra(i-1);
 			} else {
-				semaforo3 = semaforos->mostra(7);
-				semaforo4 = semaforos->mostra(6);
+				break;
 			}
-			ev1 = new Eventos(tempoParaAbertura+tempo,5,semaforo1);
-			ev2 = new Eventos(tempoParaAbertura+tempo,5,semaforo2);
-			if (tempo == tempoParaAbertura) {
-				ev3 = new Eventos(tempoParaAbertura+tempo,6,semaforo3);
-				ev4 = new Eventos(tempoParaAbertura+tempo,6,semaforo4);
-			}
-			relogio->adicionaEvento(ev1);
-			relogio->adicionaEvento(ev2);
-			relogio->adicionaEvento(ev3);
-			relogio->adicionaEvento(ev4);
 		}
-		tempo = tempoParaAbertura + tempo;
+		for (int i = 0; i < 8; i++) {
+			semaforo = semaforos->mostra(i);
+			if (semaforo->isOpen() == true) {
+				Eventos* ev = semaforo->passaSemaforo(temporizacao1);
+				relogio->adicionaEmOrdem(ev);
+				temporizacao1 = ev->getTimer();
+			}
+		}
+		temporizacao1 = 0;
+		while (temporizacao1 < tempoExecucao) {
+			Eventos* ev1;
+			Semaforo* semaforo1;
+			Semaforo* semaforo2;
+			Semaforo* semaforo3;
+			Semaforo* semaforo4;
+			for (int i = 0; i < 8; i+=2) {
+				semaforo1 = semaforos->mostra(i);
+				semaforo2 = semaforos->mostra(i+1);
+				if (i >= 2) {
+					semaforo3 = semaforos->mostra(i-2);
+					semaforo4 = semaforos->mostra(i-1);
+				} else {
+					semaforo3 = semaforos->mostra(7);
+					semaforo4 = semaforos->mostra(6);
+				}
+				if (temporizacao1 == 0) {
+					ev1 = new Eventos(temporizacao1+tempoParaAbertura, 5, semaforo1, semaforo2, nullptr,nullptr);
+					relogio->adicionaEmOrdem(ev1);
+				} else {
+					ev1 = new Eventos(temporizacao1+tempoParaAbertura,6,semaforo1,semaforo2,semaforo3,semaforo4);
+					relogio->adicionaEmOrdem(ev1);
+				}
+			}
+			temporizacao1 = ev1->getTimer();
+		}
 	}
 	/*!
 	 * @brief método que processa e executa todos os eventos do sistema.
 	 */
 	void RodarTudo() {
-		tempoAtual = 0;
 		int contador = 0;
-		while (tempoAtual <= tempoExecucao) {
-			Eventos* ev = relogio->mostrar(contador);
+		for (int i = 0; i < relogio->quantidadeEventos(); i++) {
+			Eventos* ev = relogio->mostra(i);
+			if (tempoAtual >= tempoExecucao) {
+				break;
+			}
 			switch (ev->getType()) {
+				case 0: {
+					break;
+					tempoAtual = tempoAtual + ev->getTimer();
+				}
 				case 1: {
 					Pista* track = (Pista*) ev->getObject();
-					track->adicionaCarro(new Carro());
+					Carro* carro = new Carro();
+					track->adicionaCarro(carro);
+					carrosQueEntraram++;
+					Eventos* eve = track->tempoParaChegarAoFim(tempoAtual, carro);
+					relogio->retiraEspecifico(ev);
 					tempoAtual = tempoAtual + ev->getTimer();
-					relogio->retiraEvento(ev);
 					break;
 				}
 				case 2: {
 					Semaforo* semaf = (Semaforo*) ev->getObject();
 					Pista* local = semaf->getLocal();
-					Carro* carro = local->retiraCarro();
 					Pista* prox = semaf->nextPista();
-					prox->adicionaCarro(carro);
-					tempoAtual = tempoAtual + ev->getTimer();
-					relogio->retiraEvento(ev);
+					if (prox->pistaCheia() == false && semaf->isOpen() == true) {
+						Carro* carro = local->retiraCarro();
+						prox->adicionaCarro(carro);
+						Eventos* eve = prox->tempoParaChegarAoFim(tempoAtual, carro);
+						relogio->retiraEspecifico(ev);
+						tempoAtual = tempoAtual + ev->getTimer();
+					} else {
+						break;
+					}
 					break;
 				}
 				case 3:	{
 					Pista* pista = (Pista*) ev->getObject();
 					pista->retiraCarro();
+					carrosQueSairam++;
+					relogio->retiraEspecifico(ev);
 					tempoAtual = tempoAtual + ev->getTimer();
-					relogio->retiraEvento(ev);
 					break;
 				}
 				case 4: {
+					relogio->retiraEspecifico(ev);
 					tempoAtual = tempoAtual + ev->getTimer();
-					relogio->retiraEvento(ev);
 					break;
 				}
 				case 5: {
-					Semaforo* semaforo = (Semaforo*) ev->getObject();
-					semaforo->AbreFecha();
+					Semaforo* semaforo1 = (Semaforo*) ev->getObject();
+					Semaforo* semaforo2 = (Semaforo*) ev->getObject2();
+					semaforo2->AbreFecha();
+					semaforo1->AbreFecha();
+					tempoAtual = tempoAtual + ev->getTimer();
 					break;
 				} 
 				case 6: {
-					Semaforo* semaforo = (Semaforo*) ev->getObject();
-					semaforo->AbreFecha();
-					int cont = 0;
-					cont++;
-					if (cont == 2) {
-						cont = 0;
-						tempoAtual = tempoAtual + ev->getTimer();
-					}
+					Semaforo* semaforo1 = (Semaforo*) ev->getObject();
+					Semaforo* semaforo2 = (Semaforo*) ev->getObject2();
+					Semaforo* semaforo3 = (Semaforo*) ev->getObject3();
+					Semaforo* semaforo4 = (Semaforo*) ev->getObject4();
+					semaforo1->AbreFecha();
+					semaforo2->AbreFecha();
+					semaforo3->AbreFecha();
+					semaforo4->AbreFecha();
+					tempoAtual = tempoAtual + ev->getTimer();
 					break;
 				}
 				default: {
-					throw "ALGO ERRADO NÃO ESTA CERTO";
+					std::cout << "ALGO ERRADO NÃO ESTA CERTO" << std::endl;
 				}
 			}
+			contador++;
 		}
+	}
+	/*!
+	 * @brief método que inicializa tudo chamando os dois principais métodos
+	 * @see GerarEventos()
+	 * @see RodarTudo()
+	 */
+	void trafego() {
+		GerarEventos();
+		RodarTudo();
 		dadosFinais();
 	}
-	// TO DO -- probabilidades do carro entrar em uma pista, gerar tamanho aleatorio do carro, e cpp do programa.
+	/*!
+	 * @brief método para finalizar o programa que apenas joga os dados para a saida.
+	 */
 	void dadosFinais() {
-		for (int i = 0; i < 14; i++) {
-			Pista* pista = pistas->mostra(i);
-			std::cout << "Carros que entraram na pista " << (i+1) << pista->getCarrosEntraram() << std::endl;
-			std::cout << "Carros que sairam da pista " << (i+1) << pista->getCarrosQueSairam() << std::endl;
-		}
+		int contador = 1;
+		std::cout << "Carros totais que entraram no sistema: " << carrosQueEntraram << std::endl;
+		std::cout << "Carros que sairam do sistema: " << carrosQueSairam << std::endl;
 	}
 };

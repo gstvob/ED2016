@@ -1,4 +1,4 @@
-//! Copyright 2016 Gustavo Borges França
+//! Copyright 2016 Gustavo Borges França && Nathan Werlich
 #include "Elemento.hpp"
 
 template<typename T>
@@ -115,13 +115,13 @@ class ListaEnc {
 	    } else if (pos == 0) {
 	        adicionaNoInicio(dado);
 	    } else {
-	        Elemento<T> *anterior, *atual;
+	        Elemento<T> *anterior, *atual = new Elemento<T>(dado,nullptr);
 	        anterior = head;
 	        for (int i = 0; i < pos-1; i++) {
 	            anterior = anterior->getProximo();
 	        }
-	        atual = anterior->getProximo();
-	        anterior->setProximo(new Elemento<T>(dado, atual));
+	        atual->setProximo(anterior->getProximo());
+	        anterior->setProximo(atual);
 	        size++;
 	    }
 	}
@@ -190,6 +190,11 @@ class ListaEnc {
 	        throw "ERROELEMENTOINEXISTENTE";
 	    }
 	}
+	/*!
+	 * @brief método para mostrar o dado que se encontra em uma certa posicao.
+	 * @param inteiro a posicao em que se encontra o dado que se quer saber.
+	 * @return generico que é o dado que se encontra na posicao passada como parametro.
+	 */
 	T mostra(int pos) const {
 	    Elemento<T> *atual;
 	    T data;
@@ -198,9 +203,10 @@ class ListaEnc {
 	        throw "ERROLISTAVAZIA";
 	    } else {
 	        atual = head;
-	        anda = 1;
-	        while (anda <= pos) {
+	        anda = 0;
+	        while (anda < pos) {
 				atual = atual->getProximo();
+	   			anda++;
 	        }
 	        data = atual->getInfo();
 	        return data;
@@ -252,14 +258,14 @@ class ListaEnc {
 	T retiraDaPosicao(int pos) {
 	    Elemento<T> *anterior, *deletoso;
 	    T volta;
-        if (pos < 0 || pos > size - 1) {
+        if (pos < 0 || pos > size) {
 	        throw "ERROPOSICAO";
 	    } else {
 	       if (pos == 0) {
 	        return(retiraDoInicio());
 	       } else {
 	            anterior = head;
-	            for (int i = 1; i < pos; i++) {
+	            for (int i = 0; i < pos - 2; i++) {
 	                anterior = anterior->getProximo();
 	            }
                 deletoso = anterior->getProximo();
@@ -282,11 +288,7 @@ class ListaEnc {
  * @see listaVazia(), adicionaNoInicio(), adicioNaPosicao()
  */
 	void adiciona(const T& dado) {
-	    if (listaVazia()) {
-	        adicionaNoInicio(dado);
-	    } else {
-            adicionaNaPosicao(dado, size);
-	    }
+        adicionaNaPosicao(dado, size);
 	}
 //! método para retirar o ultimo elemento não nulo da lista.
 /*!
@@ -315,15 +317,7 @@ class ListaEnc {
  * @see listaVazia(), retiraDaPosicao(), posicao()
  */
 	T retiraEspecifico(const T& dado) {
-	    if (listaVazia()) {
-	        throw("ERROLISTAVAZIA");
-	    } else {
-	        if (contem(dado) == true) {
-	            return(retiraDaPosicao(posicao(dado)));
-	        } else {
-	            throw "DADO INEXISTENTE";
-	        }
-	    }
+		return(retiraDaPosicao(posicao(dado) + 1));
 	}
 //! Método para adicionar os dados em ordem
 /*!
@@ -349,7 +343,7 @@ class ListaEnc {
 	        adicionaNoInicio(data);
 	    } else {
 	        atual = head;
-	        pos = 1;
+	        pos = 0;
 	        while ((atual->getProximo() != nullptr)
 	               && (maior(data, atual->getInfo()))) {
 	            atual = atual->getProximo();
@@ -358,7 +352,7 @@ class ListaEnc {
 	        if (maior(data, atual->getInfo())) {
 	            adicionaNaPosicao(data, pos+1);
 	        } else {
-	            adicionaNaPosicao(data, pos-1);
+	            adicionaNaPosicao(data, pos);
 	        }
 	    }
 	}
@@ -384,7 +378,7 @@ class ListaEnc {
  * @param dado2 outro generico qualquer para fins de comparação.
  * @return boolean, verdadeiro se dado1 for maior que dado2, falso se não.
  */
-	bool maior(T dado1, T dado2) {
+	virtual bool maior(T dado1, T dado2) const {
 	    return dado1 > dado2;
 	}
 //! método para saber se dado1 é menor que dado22

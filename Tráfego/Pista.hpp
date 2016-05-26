@@ -1,4 +1,4 @@
-/*Copyright Gustavo Borges && Nathan Werlich*/
+/*Copyright Gustavo Borges && Nathan Werlich 2016*/
 #include "Carro.hpp"
 #include "Fila.hpp"
 #include "Eventos.hpp"
@@ -13,7 +13,6 @@ private:
 	int tamanho, espacoOcupado; /*<! inteiros do tamanho da pista e do espaco que está sendo ocupado.>*/
 	int velocidade, tempoParaFim; /*<! inteiros da velocidade da pista, e do tempo que o carro vai levar para chegar no seu fim>*/
 	int frequencia; /*<! inteiro que indica a frequencia com que carros são criados na pista.>*/
-	int carrosQueEntraram, carrosQueSairam; /*<! inteiros que indicam quantos carros entraram em uma pista e quantos sairam.>*/
 	bool font,sumidouro; /*<! booleanos que indicam se a pista é uma fonte ou um sumidouro.>*/
 
 public:
@@ -24,8 +23,6 @@ public:
 		tamanho = _tamanho;
 		velocidade = _velocidade;
 		frequencia = _frequencia;
-		carrosQueEntraram = 0;
-		carrosQueSairam = 0;
 		if (frequencia == 0) {
 			font = false;
 			sumidouro = true;
@@ -46,10 +43,9 @@ public:
 			std::cout << "um carro foi impedido de mudar de pista" << std::endl;
 		} else {
 			if (carro->getTamanho() + espacoOcupado == tamanho) {
-				throw "ERRO";
+				std::cout << "Um carro tentou entrar numa pista sem espaço" << std::endl;
 			} else {
 				this->inclui(carro);
-				carrosQueEntraram++;
 			}
 		}
 	}
@@ -57,33 +53,24 @@ public:
 	 * @brief método para marcar o evento de um carro chegando ao fim de uma pista.
 	 * @param inteiro que indica o tempo atual que se encontra o programa.
 	 * @return ponteiro do tipo eventos.
-	 * @see tempoParaChegaoAoFimSumidouro(). gerarCarros().
+	 * @see tempoParaChegaoAoFimSumidouro(). 
+	 * @see gerarCarros().
+	 * @see chegarAoFim()
 	 */
-	Eventos* tempoParaChegarAoFim(int currentTime) {
+	Eventos* tempoParaChegarAoFim(int currentTime, Carro* carro) {
 		Eventos* ev;
 		if (this->pistaCheia() == true) {
 			return ev = new Eventos(0,0,nullptr);
 		} else {
-			Carro* carro = this->primeiro();
-			int tempo = this->chegarAoFim(carro);
-			ev = new Eventos(tempo+currentTime, 4,this);
-			return ev;
-		}
-	}
-	/*!
-	 * @brief Método para marcar o evento de um carro chegando ao fim de um sumidouro.
-	 * @param inteiro que indica o tempo atual do programa.
-	 * @see tempoParaChegarAoFim(), GerarCarros().
-	 */
-	Eventos* tempoParaChegarAoFimSumidouro(int currentTime) {
-		Eventos* ev;
-		if (this->pistaCheia() == true || this->isSumidouro() == false) {
-			return ev = new Eventos(0,0,nullptr);
-		} else {
-			Carro* carro = this->primeiro();
-			int tempo = this->chegarAoFim(carro);
-			ev = new Eventos(tempo+currentTime, 3, this);
-			return ev;
+			if (this->isSumidouro() == true) {
+				int tempo = this->chegarAoFim(carro) + currentTime;
+				ev = new Eventos(tempo, 3, this);
+				return ev;
+			} else {
+				int tempo = this->chegarAoFim(carro) + currentTime;
+				ev = new Eventos(tempo, 4,this);
+				return ev;
+			}
 		}
 	}
 	/*!
@@ -97,6 +84,7 @@ public:
 			return ev = new Eventos(0,0,nullptr);
 		} else {
 			ev = new Eventos(frequencia+currentTime, 1,this);
+			currentTime = ev->getTimer();
 			return ev;
 		}
 	}
@@ -106,17 +94,17 @@ public:
 	 * @return inteiro que é o tempo que o carro demora para chegar ao fim.
 	 */
 	int chegarAoFim(Carro* carro) {
-		int localCheg = carro->getTamanho() - tamanho - espacoOcupado;
+		int localCheg = tamanho - espacoOcupado - carro->getTamanho();
 		int vels = velocidade/3.6;
 		int tempo = 0;
 		if (localCheg > 0) {
-			while (vels != localCheg) {
+			while (vels < localCheg) {
 				vels +=vels;
 				tempo++;
 			}
 				return tempo;
 			} else {
-				throw "Impossivel chegar nesse local.";
+				std::cout << "Um carro tentou chegar a um local inacessivel" << std::endl;
 			}
 	}
 	/*!
@@ -125,20 +113,20 @@ public:
 	 */
 	Carro* retiraCarro() {
 		if (pistaVazia()) {
-			throw "ERROPISTAVAZIA";
+			throw "ERRO";
 		} else {
-			espacoOcupado = espacoOcupado - this->primeiro()->getTamanho();
-			return this->retira();
-			carrosQueSairam++;
+			Carro* carro = primeiro();
+			espacoOcupado = espacoOcupado - carro->getTamanho();
+			this->retira();
+			return carro;
 		}
 	}
-
 	/*!
      * @brief método para retornar o primeiro carro de uma pista.
      * @return o primeiro carro da pista.
 	 */
 	Carro* primeiro() {
-		return this->primeiro();
+		return this->prim();
 	}
 	/*!
 	 * @brief método para retornar se a pista está vazia.
@@ -188,11 +176,5 @@ public:
 	 */
 	int getFrequencia() {
 		return frequencia;
-	}
-	int getCarrosEntraram() {
-		return carrosQueEntraram;
-	}
-	int getCarrosQueSairam() {
-		return carrosQueSairam;
 	}
 };
