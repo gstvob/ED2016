@@ -32,13 +32,13 @@ class NoAVL {
         elementos.clear();
     }
     virtual ~NoAVL() {
-		delete dado;
-		if (esquerda != NULL) {
-			delete esquerda;
-		}
-		if (direita != NULL) {
-			delete direita;
-		}
+        delete dado;
+        if (esquerda != NULL) {
+            delete esquerda;
+        }
+        if (direita != NULL) {
+            delete direita;
+        }
     }
     /*!
      * @brief Construtor da Classe NoAVL
@@ -51,12 +51,27 @@ class NoAVL {
      * @brief Construtor da Classe NoAVL
      * @details
     */
-	int altura(NoAVL<T>* node) {
-		if(node == NULL)
-			return -1;
-		else
-			return node->getAltura();
-	}
+    int altura(NoAVL<T>* node) {
+        if(node == NULL)
+            return -1;
+        else
+            return node->getAltura();
+    }
+
+    int alturaEsq(NoAVL<T>* node) {
+        if(node == NULL)
+            return -1;
+        else
+            return altura(node->getEsquerda());
+    }
+
+    int alturaDir(NoAVL<T>* node) {
+        if(node == NULL)
+            return -1;
+        else
+            return altura(node->getDireita());
+    }
+
     /*!
      * @brief Construtor da Classe NoAVL
      * @details
@@ -90,26 +105,64 @@ class NoAVL {
      * @details
     */
     NoAVL<T>* remover(NoAVL<T>* arv, const T& dado) {
-        NoAVL<T> *tmp, *filho;
+        NoAVL<T> *tmp, *filho, *arv_rodada;
         if (arv == NULL) {
             return arv;
         } else {
             if (dado < *arv->getDado()) {
                 arv->esquerda = remover(arv->getEsquerda(), dado);
-                    // zigue zague
+                if (altura(arv->getEsquerda()) > altura(arv->getDireita())) {
+                    if (alturaEsq(arv->getEsquerda()) >=
+                        alturaDir(arv->getEsquerda())) {
+                        arv = simp_roda_esq(arv);
+                    } else {
+                        arv = dup_roda_esq(arv);
+                    }
+                } else if (altura(arv->getEsquerda()) < altura(arv->getDireita())) {
+                    if (alturaDir(arv->getDireita()) >=
+                        alturaEsq(arv->getDireita())) {
+                        arv = simp_roda_dir(arv);
+                    } else {
+                        arv = dup_roda_dir(arv);
+                    }
+                }    
+        
+                arv->altur = std::max(altura(arv->getEsquerda()),
+                            altura(arv->getDireita())) + 1;            
                 return arv;
             } else {
                 if (dado > *arv->getDado()) {
                     arv->direita = remover(arv->getDireita(), dado);
-                    // zigue zague
+                if (altura(arv->getEsquerda()) > altura(arv->getDireita())) {
+                    if (alturaEsq(arv->getEsquerda()) >=
+                        alturaDir(arv->getEsquerda())) {
+                        arv = simp_roda_esq(arv);
+                    } else {
+                        arv = dup_roda_esq(arv);
+                    }
+                } else if (altura(arv->getEsquerda()) < altura(arv->getDireita())) {
+                    if (alturaDir(arv->getDireita()) >=
+                        alturaEsq(arv->getDireita())) {
+                        arv = simp_roda_dir(arv);
+                    } else {
+                        arv = dup_roda_dir(arv);
+                    }
+                }   
+                arv->altur = std::max(altura(arv->getEsquerda()),
+                            altura(arv->getDireita())) + 1;            
+                             
+
                     return arv;
                 } else {
                     if (arv->getDireita() != NULL &&
                                                 arv->getEsquerda() != NULL) {
                         tmp = minimo(arv->getDireita());
-                        arv->dado = tmp->getDado();
+                        *arv->dado = *tmp->getDado();
                         arv->direita = remover(arv->getDireita(),
                         *arv->getDado());
+                        arv->altur = std::max(altura(arv->getEsquerda()),
+                            altura(arv->getDireita())) + 1;            
+                
                         return arv;
                     } else {
                         tmp = arv;
@@ -273,12 +326,9 @@ class NoAVL {
                             arv_rodada = simp_roda_esq(arv);
                         } else {
                             arv_rodada = dup_roda_esq(arv);
-                            if (pai->esquerda == arv) {
-                                pai->esquerda = arv_rodada;
-                            } else {
-                                pai->direita = arv_rodada;
-                            }
                         }
+                        return arv_rodada;
+                    } else {
                         arv->altur = std::max(altura(arv->getEsquerda()),
                                                 altura(arv->getDireita())) + 1;
                     }
@@ -288,17 +338,14 @@ class NoAVL {
                                                 (dado, arv->getDireita(), arv);
                         if ((altura(arv->getDireita()) -
                                               altura(arv->getEsquerda())) > 1) {
-                            if (dado < *arv->direita->getDado()) {
+                            if (dado > *arv->direita->getDado()) {
                                 arv_rodada = simp_roda_dir(arv);
                             } else {
                                 arv_rodada = dup_roda_dir(arv);
-                                if (pai->direita == arv) {
-                                    pai->direita = arv_rodada;
-                                } else {
-                                    pai->esquerda = arv_rodada;
-                                }
                             }
-                        arv->altur = std::max(altura(arv->getDireita()),
+                            return arv_rodada;
+                        } else {
+                            arv->altur = std::max(altura(arv->getDireita()),
                                                 altura(arv->getEsquerda())) + 1;
                         }
                     } else {
