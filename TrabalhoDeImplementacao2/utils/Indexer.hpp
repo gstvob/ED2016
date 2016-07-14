@@ -37,14 +37,18 @@ public:
 		BeginIndex();
 
 	}
-
+	/*!
+	 * @brief método para começar a indexação.
+	 */
 	void BeginIndex() {
 		cout << "Aguarde enquanto as indexações ocorrem " << endl;
 		Index();
 		Primariasdat();
 		Secundariasdat();
 	}
-
+	/*!
+	 * @brief método que ĺe os arquivos da manpage e cria duas arvores.
+	 */
 	void Index() {
 		word_helper conectivos;
 
@@ -76,6 +80,9 @@ public:
 		}
 	}
 
+	/*!
+	 * @brief método que cria o arquivo .dat das chaves primarias.
+	 */
 	void Primariasdat() {
 		ofstream output("BuscaPorPrimarias.dat");
 
@@ -93,18 +100,7 @@ public:
 	}
 	void Secundariasdat() {
 		ofstream output("BuscaPorSecundarias.dat");
-
 		if (output.is_open()) {
-			vector<Word> wordPosOrdem = secondaryKeys.posOrdem(secondaryKeys); // colocar o pós ordem aqui depois
-			for (unsigned int i = 0; i < wordPosOrdem.size(); i++) {
-				output << wordPosOrdem.at(i).returnWord();
-				Lista<string> comandos = wordPosOrdem.at(i).returnCmdContain();
-				for (int j = 0; j < comandos.getTamanho(); j++) {
-					output << ' ' << comandos.getDado(j);
-				}
-				output << endl;
-			}
-			output.close();
 		}
 	}
 };

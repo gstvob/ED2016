@@ -1,3 +1,4 @@
+/*Copyright Gustavo Borges, Nathan Werlich*/
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -6,6 +7,10 @@
 #include "utils/Finder.hpp"
 
 using namespace std;
+
+/*!
+ * @brief método main que faz a indexação das manpages e cuida das buscas.
+ */
 
 int main(int argc, char **argv) {
 	if (argc <= 2) {

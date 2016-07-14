@@ -1,228 +1,380 @@
-//! Copyright Gustavo Borges França , Nathan Werlich 2016
+/* Copyright 2016 - Nathan Sargon Werlich, Gustavo Borges */
 #ifndef NO_AVL_HPP
 #define NO_AVL_HPP
 #include <vector>
+#include <cstdlib>
+#include <stdexcept>
 #include <algorithm>
 
 template <typename T>
-class NoAVL  {
+/*!
+ * @brief Construtor da Classe NoAVL
+ * @details
+*/
+class NoAVL {
  private:
-    int altura;  //!< Representa a altura do nó AVL
-    T* dado;  //!< Ponteiro generico que representa o dado do nó AVL
-    NoAVL<T>* esquerda;  //!< "Filho" da esquerda de um nó "Pai"
-    NoAVL<T>* direita;  //!< "Filho" da direita de um nó "pai"
-    std::vector<NoAVL<T>* > elementos; //
+    int altur;  //!< Representa a altura do nó AVL
+    T* dado;
+    NoAVL<T>* esquerda;
+    NoAVL<T>* direita;
+    std::vector<NoAVL<T>* > elementos;
 
  public:
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     explicit NoAVL(const T& dado) {
-        esquerda = nullptr;
-        direita = nullptr;
-        altura = 0;
+        altur = 0;
         this->dado = new T(dado);
-    }
-    virtual ~NoAVL() {
-        delete esquerda;
-        delete direita;
-        delete dado;
-        altura = 0;
+        esquerda = NULL;
+        direita = NULL;
         elementos.clear();
     }
-    int getAltura() {
-        return altura;
+    virtual ~NoAVL() {
+        delete dado;
+        if (esquerda != NULL) {
+            delete esquerda;
+        }
+        if (direita != NULL) {
+            delete direita;
+        }
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    int getAltura() {
+        return altur;
+    }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    int altura(NoAVL<T>* node) {
+        if (node == NULL)
+            return -1;
+        else
+            return node->getAltura();
+    }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    int alturaEsq(NoAVL<T>* node) {
+        if (node == NULL)
+            return -1;
+        else
+            return altura(node->getEsquerda());
+    }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    int alturaDir(NoAVL<T>* node) {
+        if (node == NULL)
+            return -1;
+        else
+            return altura(node->getDireita());
+    }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     std::vector<NoAVL<T>* > getElementos() {
         return elementos;
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     NoAVL<T>* getEsquerda() {
         return esquerda;
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     NoAVL<T>* getDireita() {
         return direita;
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     NoAVL<T>* inserir(const T& dado, NoAVL<T>* arv) {
-        return insereAVL(dado, arv, nullptr);     
+        return insercaoAVL(dado, arv, NULL);
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     NoAVL<T>* remover(NoAVL<T>* arv, const T& dado) {
-        NoAVL<T>* temp, *filho;
-        if (arv == nullptr) {
+        NoAVL<T> *tmp, *filho;
+        if (arv == NULL) {
             return arv;
         } else {
             if (dado < *arv->getDado()) {
                 arv->esquerda = remover(arv->getEsquerda(), dado);
-                arv = Ziguezague(arv);
-                arv->altura = std::max(alt(arv->getEsquerda()),
-                            alt(arv->getDireita())) + 1; 
-                return arv;
-            } else if (dado > *arv->getDado()) {
-                arv->direita = remover(arv->getDireita(), dado);
-                arv = Ziguezague(arv);
-                arv->altura = std::max(alt(arv->getEsquerda()),
-                            alt(arv->getDireita())) + 1; 
+                if (altura(arv->getEsquerda()) > altura(arv->getDireita())+1) {
+                    if (alturaEsq(arv->getEsquerda()) >=
+                                                alturaDir(arv->getEsquerda())) {
+                        arv = simp_roda_esq(arv);
+                    } else {
+                        arv = dup_roda_esq(arv);
+                    }
+                } else if (altura(arv->getEsquerda())+1 <
+                                                    altura(arv->getDireita())) {
+                    if (alturaDir(arv->getDireita()) >=
+                                                 alturaEsq(arv->getDireita())) {
+                        arv = simp_roda_dir(arv);
+                    } else {
+                        arv = dup_roda_dir(arv);
+                    }
+                }
+                arv->altur = std::max(altura(arv->getEsquerda()),
+                            altura(arv->getDireita())) + 1;
                 return arv;
             } else {
-                if (arv->getDireita() != nullptr &&
-                                    arv->getEsquerda() != nullptr) {
-                    temp = minimo(arv->getDireita());
-                    arv->dado = temp->getDado();
-                    arv->direita = remover(arv->getDireita(), *arv->getDado());
+                if (dado > *arv->getDado()) {
+                    arv->direita = remover(arv->getDireita(), dado);
+                    if (altura(arv->getEsquerda()) >
+                                                altura(arv->getDireita())+1) {
+                        if (alturaEsq(arv->getEsquerda()) >=
+                                                alturaDir(arv->getEsquerda())) {
+                            arv = simp_roda_esq(arv);
+                        } else {
+                            arv = dup_roda_esq(arv);
+                        }
+                    } else if (altura(arv->getEsquerda())+1 <
+                                                    altura(arv->getDireita())) {
+                        if (alturaDir(arv->getDireita()) >=
+                            alturaEsq(arv->getDireita())) {
+                            arv = simp_roda_dir(arv);
+                        } else {
+                            arv = dup_roda_dir(arv);
+                        }
+                    }
+                    arv->altur = std::max(altura(arv->getEsquerda()),
+                                                 altura(arv->getDireita())) + 1;
                     return arv;
                 } else {
-                    temp = arv;
-                    if (arv->getDireita() != nullptr) {
-                        filho = arv->getDireita();
-                        return filho;
-                    } else if (arv->getEsquerda() != nullptr) {
-                        filho = arv->getEsquerda();
-                        return filho;
+                    if (arv->getDireita() != NULL &&
+                                                arv->getEsquerda() != NULL) {
+                        tmp = minimo(arv->getDireita());
+                        *arv->dado = *tmp->getDado();
+                        arv->direita = remover(arv->getDireita(),
+                        *arv->getDado());
+                        if (altura(arv->getEsquerda()) >
+                                                altura(arv->getDireita())+1) {
+                            if (alturaEsq(arv->getEsquerda()) >=
+                                                alturaDir(arv->getEsquerda())) {
+                                arv = simp_roda_esq(arv);
+                            } else {
+                                arv = dup_roda_esq(arv);
+                            }
+                        } else if (altura(arv->getEsquerda())+1 <
+                                                 altura(arv->getDireita())) {
+                            if (alturaDir(arv->getDireita()) >=
+                                alturaEsq(arv->getDireita())) {
+                                arv = simp_roda_dir(arv);
+                            } else {
+                                arv = dup_roda_dir(arv);
+                            }
+                        }
+                        arv->altur = std::max(altura(arv->getEsquerda()),
+                           altura(arv->getDireita())) + 1;
+                        return arv;
                     } else {
-                        delete arv;
-                        return nullptr;
+                        tmp = arv;
+                        if (arv->getDireita() != NULL) {
+                            filho = arv->getDireita();
+                            return filho;
+                        } else {
+                            if (arv->getEsquerda() != NULL) {
+                                filho = arv->getEsquerda();
+                                return filho;
+                            } else {
+                                delete arv;
+                                return NULL;
+                            }
+                        }
                     }
                 }
             }
         }
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     NoAVL<T>* minimo(NoAVL<T>* nodo) {
-        NoAVL<T>* walker = nodo;
-        if (walker == nullptr) {
-            return nullptr;
+        if (nodo == NULL) {
+            return NULL;
         } else {
-            while (walker->getEsquerda() != nullptr) {
-                walker = walker->getEsquerda();
+            while (nodo->getEsquerda() != NULL) {
+                nodo = nodo->getEsquerda();
             }
-            return walker;
         }
-
+        return nodo;
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     T* getDado() {
         return dado;
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     T* busca(const T& dado, NoAVL<T>* arv) {
-        while (arv != nullptr) {
+        while (arv != NULL) {
             if (*arv->getDado() != dado) {
                 if (*arv->getDado() < dado) {
                     arv = arv->getDireita();
                 } else {
                     arv = arv->getEsquerda();
-                }   
+                }
             } else {
                 return arv->getDado();
             }
         }
-        throw "ERRO";
+    throw("!!!!!!!");
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     void preOrdem(NoAVL<T>* nodo) {
-        if (nodo != nullptr) {
+        if (nodo != NULL) {
             elementos.push_back(nodo);
             preOrdem(nodo->getEsquerda());
             preOrdem(nodo->getDireita());
         }
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     void emOrdem(NoAVL<T>* nodo) {
-        if (nodo != nullptr) {
+        if (nodo != NULL) {
             emOrdem(nodo->getEsquerda());
             elementos.push_back(nodo);
             emOrdem(nodo->getDireita());
         }
     }
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
     void posOrdem(NoAVL<T>* nodo) {
-        if (nodo != nullptr) {
+        if (nodo != NULL) {
             posOrdem(nodo->getEsquerda());
             posOrdem(nodo->getDireita());
             elementos.push_back(nodo);
         }
-        return elementos;
     }
-
-//algoritmos novos
-    int alt(NoAVL<T>* k1) {
-        if (k1 == nullptr) {
-            return -1;
-        } else {
-            return k1->getAltura();
-        }
-    }
-    NoAVL<T>* simpRodaEsq(NoAVL<T>* k2) {
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    NoAVL<T> *simp_roda_esq(NoAVL<T>* k2) {
         NoAVL<T>* k1;
         k1 = k2->getEsquerda();
         k2->esquerda = k1->getDireita();
         k1->direita = k2;
-        k2->altura = std::max(alt(k2->getEsquerda()), alt(k2->getDireita())) + 1;
-        k1->altura = std::max(alt(k1->getEsquerda()), k2->getAltura()) + 1;
+        k2->altur = std::max(altura(k2->getEsquerda()),
+                                                altura(k2->getDireita()))+1;
+        k1->altur = std::max(altura(k1->getEsquerda()),
+                                                altura(k1->getDireita()))+1;
         return k1;
     }
-    NoAVL<T>* simpRodaDir(NoAVL<T>* k2) {
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    NoAVL<T> *simp_roda_dir(NoAVL<T>* k2) {
         NoAVL<T>* k1;
         k1 = k2->getDireita();
         k2->direita = k1->getEsquerda();
         k1->esquerda = k2;
-        k2->altura = std::max(alt(k2->getDireita()), alt(k2->getEsquerda())) + 1;
-        k1->altura = std::max(alt(k1->getDireita()), k2->getAltura()) + 1;
+        k2->altur = std::max(altura(k2->getDireita()),
+                                                altura(k2->getEsquerda()))+1;
+        k1->altur = std::max(altura(k1->direita),
+                                                altura(k1->getEsquerda()))+1;
         return k1;
     }
-    NoAVL<T>* duplRodaEsq(NoAVL<T>* k3) {
-        k3->esquerda = simpRodaDir(k3->getEsquerda());
-        return (simpRodaEsq(k3));
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    NoAVL<T> *dup_roda_esq(NoAVL<T>* k3) {
+            k3->esquerda = simp_roda_dir(k3->esquerda);
+            return (simp_roda_esq(k3));
     }
-    NoAVL<T>* duplRodaDir(NoAVL<T>* k3) {
-        k3->direita = simpRodaEsq(k3->getDireita());
-        return (simpRodaDir(k3));
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    NoAVL<T> *dup_roda_dir(NoAVL<T>* k3) {
+            k3->direita = simp_roda_esq(k3->direita);
+            return (simp_roda_dir(k3));
     }
-
-    //! algoritmo de inserção do avl agora 
-    NoAVL<T>* insereAVL(const T& dado, NoAVL<T>* arv, NoAVL<T>* pai) {
+    /*!
+     * @brief Construtor da Classe NoAVL
+     * @details
+    */
+    NoAVL<T> *insercaoAVL(const T& dado, NoAVL<T>* arv, NoAVL<T>* pai) {
         NoAVL<T>* arv_rodada;
-        if (arv == nullptr) {
-            arv = new NoAVL<T>(dado);
-            if (arv == nullptr) {
-                throw "ERRO";
-            }
-        } else if (dado < *arv->getDado()) {
-            arv->esquerda = insereAVL(dado, arv->getEsquerda(), arv);
-            if (alt(arv->getEsquerda()) - alt(arv->getDireita()) > 1) {
-                if (dado < *arv->getEsquerda()->getDado()) {
-                    arv_rodada = simpRodaEsq(arv);
-                } else {
-                    arv_rodada = duplRodaEsq(arv);
-                } 
-                return arv_rodada;
-            } else {
-                arv->altura = std::max(alt(arv->getEsquerda()), alt(arv->getDireita())) + 1;
-            }
-        } else if (dado > *arv->getDado()) {
-            arv->direita = insereAVL(dado, arv->getDireita(), arv);
-            if (alt(arv->getDireita()) - alt(arv->getEsquerda()) > 1) {
-                if (dado > *arv->getDireita()->getDado()) {
-                    arv_rodada = simpRodaDir(arv);
-                } else {
-                    arv_rodada = duplRodaDir(arv);
+        if (arv == NULL) {
+                arv = new NoAVL<T>(dado);
+                if (arv == NULL) {
+                    throw("1");
                 }
-                return arv_rodada;
-            } else { 
-                arv->altura = std::max(alt(arv->getDireita()), alt(arv->getEsquerda())) + 1;
-            }
+                arv->dado = new T(dado);
+                arv->altur = 0;
+                arv->esquerda = NULL;
+                arv->direita = NULL;
         } else {
-            throw "ERRO";
+                if (dado < *arv->getDado()) {
+                    arv->esquerda = insercaoAVL
+                                                (dado, arv->getEsquerda(), arv);
+                    if ((altura(arv->getEsquerda()) -
+                                            (altura(arv->getDireita()))) > 1) {
+                        if (dado < *arv->esquerda->getDado()) {
+                            arv_rodada = simp_roda_esq(arv);
+                        } else {
+                            arv_rodada = dup_roda_esq(arv);
+                        }
+                        return arv_rodada;
+                    } else {
+                        arv->altur = std::max(altura(arv->getEsquerda()),
+                                                altura(arv->getDireita())) + 1;
+                    }
+                } else {
+                    if (dado > *arv->getDado()) {
+                        arv->direita = insercaoAVL
+                                                (dado, arv->getDireita(), arv);
+                        if ((altura(arv->getDireita()) -
+                                              altura(arv->getEsquerda())) > 1) {
+                            if (dado > *arv->direita->getDado()) {
+                                arv_rodada = simp_roda_dir(arv);
+                            } else {
+                                arv_rodada = dup_roda_dir(arv);
+                            }
+                            return arv_rodada;
+                        } else {
+                            arv->altur = std::max(altura(arv->getDireita()),
+                                                altura(arv->getEsquerda())) + 1;
+                        }
+                    } else {
+                        throw("1");
+                    }
+                }
         }
         return arv;
-    }
-    NoAVL<T>* Ziguezague(NoAVL<T>* k3) {
-        if (alt(k3->getEsquerda()) > alt(k3->getDireita())) {
-            NoAVL<T>* esq = k3->getEsquerda();
-            if (alt(esq->getEsquerda()) >= alt(esq->getDireita())) {
-                k3 = simpRodaEsq(k3);
-            } else {
-                k3 = duplRodaEsq(k3);
-            }
-        } else if (alt(k3->getDireita()) > alt(k3->getEsquerda())){
-            NoAVL<T>* dir = k3->getDireita();
-            if (alt(dir->getDireita()) >= alt(dir->getEsquerda())) {
-                k3 = simpRodaDir(k3);
-            } else {
-                k3 = duplRodaDir(k3);
-            }
-        }
-        return k3;
     }
 };
 

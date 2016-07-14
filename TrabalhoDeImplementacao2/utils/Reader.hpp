@@ -13,10 +13,17 @@ private:
 	std::string arch;
 
 public:
+	/*!
+	 * @brief construtor do reader
+	 * @param string que é o arquivo passado para a leitura.
+	 */
 	Reader(std::string archive) {
 		arch = archive;
 	}
 
+	/*!
+	 * @brief método para ler as manpages.
+	 */
 	Reg readManpages() {
 
 		//transforma em uma filestream a cstring do arquivo.
